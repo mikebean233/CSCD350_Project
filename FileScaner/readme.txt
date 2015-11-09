@@ -1,0 +1,1 @@
+this is the project for the file reader.  It is one class but as we don't have a working media player yet it's in a project of it's own for now.
