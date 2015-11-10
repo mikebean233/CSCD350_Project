@@ -56,7 +56,7 @@ namespace WpfApplication1
 
         private void button3_Click(object sender, RoutedEventArgs e)
         {
-            player.Pause();
+            player.Stop();
         }
     }
 }
