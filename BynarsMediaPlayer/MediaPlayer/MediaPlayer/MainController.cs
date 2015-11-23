@@ -38,9 +38,8 @@ namespace MediaPlayer
             _mediaElement = _view.mediaElement;
             _mediaElementPollingTimer = new Timer(500); // Create a timer that polls every 1/2 second
             _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
-            //_mediaElementPollingTimer.Start();
+            _mediaElementPollingTimer.Start();
 
-            // These classes need to be fleshed out with working code
             _databaseController = new DatabaseControllerStub();
             _fileScanner = new FileScannerStub(this);
 
@@ -104,6 +103,9 @@ namespace MediaPlayer
         public void AddMediaEvent(string newMediaPath)
         {
             Console.WriteLine("Add media file: " + newMediaPath);
+
+            // TODO: Use the tag library to extract the ID3 info from the files and pass that info below...
+            _databaseController.addToLibrary(newMediaPath,"TestFileName.mp3", "TestTitle", "TestDuration", "TestArtist", "TestAlbum");
         }
 
         public void FetchMediaLibraryData() { }
