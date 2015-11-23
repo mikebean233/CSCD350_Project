@@ -22,10 +22,15 @@ namespace MediaPlayer
         private Timer _mediaElementPollingTimer;
         private DatabaseControllerStub _databaseController;
         private FileScannerStub _fileScanner;
+        private Thread _fileScannerThread;
+        private List<string> _supportedExtentions;
+        
+        public List<string> SupportedExtentions { get { return _supportedExtentions; } } 
 
         public MainController(MainWindow view)
         {
             _view =  view;
+            _supportedExtentions = new List<string>() {"*mp3", "*m4a", "*mp4"};
         }
 
         public void Setup()
@@ -33,14 +38,14 @@ namespace MediaPlayer
             _mediaElement = _view.mediaElement;
             _mediaElementPollingTimer = new Timer(500); // Create a timer that polls every 1/2 second
             _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
-            _mediaElementPollingTimer.Start();
+            //_mediaElementPollingTimer.Start();
 
             // These classes need to be fleshed out with working code
             _databaseController = new DatabaseControllerStub();
             _fileScanner = new FileScannerStub(this);
 
-            Thread fileScannerThread = new Thread(new ParameterizedThreadStart(_fileScanner.ScanDirectory ));
-            fileScannerThread.Start("C:\\");
+            _fileScannerThread = new Thread(new ParameterizedThreadStart(_fileScanner.ScanDirectory ));
+            _fileScannerThread.Start("C:\\");
             /**
              *   TODO:
              *      1) load serialized state from savedState.cfg (in current directory)
@@ -63,6 +68,7 @@ namespace MediaPlayer
         }
 
 
+        
         /// <summary>
         /// 
         /// </summary>
@@ -95,7 +101,10 @@ namespace MediaPlayer
 
         // This method is called by the FileScanner 
         // (or possibly another piece of code) when a new file needs to be added to the library
-        public void AddMediaEvent(string newMediaPath) { Console.WriteLine("Add media file: " + newMediaPath);}
+        public void AddMediaEvent(string newMediaPath)
+        {
+            Console.WriteLine("Add media file: " + newMediaPath);
+        }
 
         public void FetchMediaLibraryData() { }
 
@@ -105,7 +114,14 @@ namespace MediaPlayer
         public void PauseButtonPressed() { Console.WriteLine("Pause");}
         public void VolumeChanged() { Console.WriteLine("Volume");}
         public void ProgressBarMovedByUser() { Console.WriteLine("ProgressBar");}
-        public void CloseWindow() { Console.WriteLine("Close");}
+
+        public void CloseWindow()
+        {
+            Console.WriteLine("Close");
+            _fileScannerThread.Abort();
+            _mediaElementPollingTimer.Stop();
+            _mediaElementPollingTimer.Close();
+        }
         public void MediaCompleted() { }
         public void MediaFileError() { }
         #endregion View Events 
