@@ -37,22 +37,7 @@ namespace MediaPlayer
             _view =  view;
             _supportedExtentions = new List<string>() {"*mp3", "*m4a", "*mp4"};
         }
-        public TagModel  getID3Tags(string filePath)
-        {
-            try
-            {
-                Mp3File mp3File = new Mp3File(filePath);
-                TagModel thisModel = mp3File.TagModel;
-                return thisModel;
-            }
-            catch (Exception e)
-            {
-                TagModel thisModel = new TagModel();
-                return thisModel;
-            }
 
-            
-        }
         public void Setup()
         {
             _mediaElement = _view.mediaElement;
