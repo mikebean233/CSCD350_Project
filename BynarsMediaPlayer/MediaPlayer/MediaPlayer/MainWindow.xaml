@@ -106,5 +106,6 @@
             </TabItem>
 
         </TabControl>
+        <Button x:Name="BTN_help" Style="{StaticResource ResourceKey=mediaButton}" Content="?" HorizontalAlignment="Center" Margin="778,402,350,0" VerticalAlignment="Top" Width="20" Height="20" Click="HelpBox" Foreground="#FFFBFBFB"/>
     </Grid>
 </Window>

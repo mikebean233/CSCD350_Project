@@ -59,5 +59,17 @@ namespace MediaPlayer
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.CloseWindow()), new object[] { });
         }
+
+        private void HelpBox(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Bynars Media Player" + Environment.NewLine
+                            + "Version 1.0" + Environment.NewLine
+                            + "by: Micheal Peterson, Travis Heppner, Lexi Guches" + Environment.NewLine
+                            + "To use soft ware go to the library tab and add media to the playlist." + Environment.NewLine
+                            + "Then hit the play button in order to start the media playlist. " + Environment.NewLine
+                            + "The next button will go to the next media, while the previous will" + Environment.NewLine
+                            + "go to the previous media.  There is also two sliders to control the" + Environment.NewLine
+                            + "position of the media, and the volume of playback.");
+        }
     }
 }
