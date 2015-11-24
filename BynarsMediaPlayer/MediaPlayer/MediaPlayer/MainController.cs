@@ -12,6 +12,8 @@ using ICSharpCode;
 using ICSharpCode.SharpZipLib;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using Id3Lib;
 using Mp3Lib;
 namespace MediaPlayer
@@ -108,8 +110,15 @@ namespace MediaPlayer
         public void AddMediaEvent(string newMediaPath)
         {
             //Console.WriteLine("Add media file: " + newMediaPath);
+
             Dictionary<string, string> tags = TagManager.GetMediaTags(newMediaPath);
-            _databaseController.addToLibrary(newMediaPath, tags["filename"], tags["title"], tags["duration"], tags["artist"], tags["album"], tags["filetype"], 0);
+            int duration = 0;
+            try{Int32.Parse(tags["duration"]);} catch (Exception e) { }
+
+            _databaseController.addToLibrary(newMediaPath, tags["filename"], tags["title"], duration, tags["artist"], tags["album"], tags["filetype"], 0);
+            
+            _view.Dispatcher.Invoke(new Action(() => _databaseController.retrievePlaylistToDataGrid(_view.dataGrid_MediaL)), new object[] { });
+
         }
 
         public void FetchMediaLibraryData() { }

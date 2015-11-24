@@ -23,7 +23,7 @@ namespace MediaPlayer
 
                 sqlConnection = new SQLiteConnection("Data Source = media.DB;Version = 3");
                 sqlConnection.Open();
-                String sql = "CREATE TABLE IF NOT EXISTs library (Name VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration VARCHAR, Artist VARCHAR, Album VARCHAR) ";
+                String sql = "CREATE TABLE IF NOT EXISTs library (Name VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration VARCHAR, Artist VARCHAR, Album VARCHAR, Position VARCHAR) ";
                 sqlCommand = new SQLiteCommand(sql, sqlConnection);
                 sqlCommand.ExecuteNonQuery();
             }
@@ -40,7 +40,15 @@ namespace MediaPlayer
 
         public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album)
         {
-            addToLibrary(fileLocation,fileName,title,duration,Artist, Album, 0);
+            string fileType = "";
+            string[] splitOnPeriod;
+            if (!string.IsNullOrEmpty(fileLocation) && fileName.Contains("."))
+            {
+                splitOnPeriod = fileLocation.Split('.');
+                fileType = (splitOnPeriod[splitOnPeriod.Length - 1]);
+            }
+
+            addToLibrary(fileLocation,fileName,title,duration,Artist, Album, fileType, 0);
         }
 
         public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album, string fileType, int Position)
