@@ -6,6 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Id3Lib;
 using Mp3Lib;
+using System.Media;
+using System.Windows;
+using AsfMojo;
+using AsfMojo.File;
+using AsfMojo.Parsing;
+
 namespace MediaPlayer
 {
     class TagManager
@@ -37,7 +43,7 @@ namespace MediaPlayer
             Dictionary<string, string> ID3Tags = new Dictionary<string, string>();
             foreach (string thisValue in _knownTags.Values)
                 ID3Tags[thisValue] = "unknown " + thisValue;
-            
+
             if (!string.IsNullOrEmpty(mediaPath))
             {
                 //determine the type of the file
@@ -48,27 +54,45 @@ namespace MediaPlayer
 
                 try
                 {
-                    switch (extention.ToLower())
+                    string switchValue = extention.ToLower();
+                    if (switchValue == "asf") switchValue = "wmv";
+                    switch (switchValue)
                     {
                         case "mp3":
                             Mp3Lib.Mp3File mp3File = new Mp3File(mediaPath);
                             TagModel tagModel = mp3File.TagModel;
-                            foreach(Id3Lib.Frames.FrameText thisFrame in tagModel)
-                                if(_knownTags.ContainsKey(thisFrame.FrameId))
+                            foreach (Id3Lib.Frames.FrameText thisFrame in tagModel)
+                                if (_knownTags.ContainsKey(thisFrame.FrameId))
                                     ID3Tags[_knownTags[thisFrame.FrameId]] = thisFrame.Text;
 
                             break;
+                        case "wmv":
+                            AsfFile file = new AsfFile(mediaPath);
+
+                            var metadataObject =
+                                (AsfMetadataObject)
+                                    file.GetAsfObjectByType(AsfGuid.ASF_Metadata_Object).FirstOrDefault();
+
+                            if (metadataObject != null)
+                            {
+                                foreach (var item in metadataObject.DescriptionRecords)
+                                    if (ID3Tags.ContainsKey(item.Name))
+                                        ID3Tags[(string) item.Name] = (string) item.Value;
+                            }
+
+                            break;
+
                         case "wma":
                             break;
                         default:
                             return ID3Tags;
-                    }
+                    } // end switch
                 }
                 catch (Exception e)
                 {
                     return ID3Tags;
                 }
-            }// end switch
+            }
             return ID3Tags;
         }
          
