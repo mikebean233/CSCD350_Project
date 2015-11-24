@@ -8,7 +8,12 @@ using System.Windows.Controls;
 using System.Timers;
 using System.Windows;
 using Timer = System.Timers.Timer;
-
+using ICSharpCode;
+using ICSharpCode.SharpZipLib;
+using System.IO;
+using System.Reflection;
+using Id3Lib;
+using Mp3Lib;
 namespace MediaPlayer
 {
 
@@ -102,10 +107,9 @@ namespace MediaPlayer
         // (or possibly another piece of code) when a new file needs to be added to the library
         public void AddMediaEvent(string newMediaPath)
         {
-            Console.WriteLine("Add media file: " + newMediaPath);
-
-            // TODO: Use the tag library to extract the ID3 info from the files and pass that info below...
-            _databaseController.addToLibrary(newMediaPath,"TestFileName.mp3", "TestTitle", "TestDuration", "TestArtist", "TestAlbum");
+            //Console.WriteLine("Add media file: " + newMediaPath);
+            Dictionary<string, string> tags = TagManager.GetMediaTags(newMediaPath);
+            _databaseController.addToLibrary(newMediaPath, tags["filename"], tags["title"], tags["duration"], tags["artist"], tags["album"], tags["filetype"]);
         }
 
         public void FetchMediaLibraryData() { }

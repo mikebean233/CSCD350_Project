@@ -26,12 +26,6 @@ namespace MediaPlayer
                 String sql = "CREATE TABLE IF NOT EXISTs library (Name VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration VARCHAR, Artist VARCHAR, Album VARCHAR) ";
                 sqlCommand = new SQLiteCommand(sql, sqlConnection);
                 sqlCommand.ExecuteNonQuery();
-
-
-                addToLibrary("c:\\text.txt", "text.txt", "text", "1", "travis", "travis's greatest hits");
-                //libraryToString();
-
-                //Console.In.Read();
             }
 
             private void libraryToString()
@@ -44,14 +38,14 @@ namespace MediaPlayer
                     Console.WriteLine(reader["Name"] + " " + reader["Path"] + " " + reader["FileType"] + " " + reader["Title"] + " " + reader["Durration"] + " " + reader["Artist"] + " " + reader["Album"]);
             }
 
-            public void addToLibrary(String fileLocation, String fileName, String title, String duration, String Artist, String Album)
+            public void addToLibrary(String fileLocation, String fileName, String title, String duration, String Artist, String Album, String fileType)
             {
                 try
                 {
                     sqlCommand.CommandText = "INSERT INTO library (Name, Path, FileType, Title, Duration, Artist, Album) VALUES (?, ?, ?, ?, ?, ?, ?);";
                     sqlCommand.Parameters.Add("@Name", DbType.String).Value = fileName;
                     sqlCommand.Parameters.Add("@Path", DbType.String).Value = fileLocation;
-                    sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileName.Substring(fileName.IndexOf("."), 4);
+                    sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileType;
                     sqlCommand.Parameters.Add("@Title", DbType.String).Value = title;
                     sqlCommand.Parameters.Add("@Durration", DbType.String).Value = duration;
                     sqlCommand.Parameters.Add("@Artist", DbType.String).Value = Artist;
