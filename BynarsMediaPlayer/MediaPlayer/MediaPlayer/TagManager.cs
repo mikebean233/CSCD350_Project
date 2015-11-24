@@ -42,7 +42,7 @@ namespace MediaPlayer
                 Initialize();
             Dictionary<string, string> ID3Tags = new Dictionary<string, string>();
             foreach (string thisValue in _knownTags.Values)
-                ID3Tags[thisValue] = "unknown " + thisValue;
+                ID3Tags[thisValue] = "";
 
             if (!string.IsNullOrEmpty(mediaPath))
             {
@@ -55,6 +55,7 @@ namespace MediaPlayer
                 try
                 {
                     string switchValue = extention.ToLower();
+                    ID3Tags["filetype"] = switchValue;
                     if (switchValue == "asf") switchValue = "wmv";
                     switch (switchValue)
                     {
