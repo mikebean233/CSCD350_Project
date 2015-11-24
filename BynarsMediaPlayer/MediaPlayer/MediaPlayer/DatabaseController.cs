@@ -9,12 +9,12 @@ using System.Data;
 
 namespace MediaPlayer
 {
-    class DatabaseControllerStub
+    class DatabaseController
     {
        SQLiteConnection sqlConnection;
             SQLiteCommand sqlCommand;
 
-            public DatabaseControllerStub()
+            public DatabaseController()
             {
                 if (!File.Exists("media.DB"))
                 {

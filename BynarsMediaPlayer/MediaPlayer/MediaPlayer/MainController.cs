@@ -25,8 +25,8 @@ namespace MediaPlayer
         private PlayModeEnum _playMode;
         private MediaElement _mediaElement;
         private Timer _mediaElementPollingTimer;
-        private DatabaseControllerStub _databaseController;
-        private FileScannerStub _fileScanner;
+        private DatabaseController _databaseController;
+        private FileScanner _fileScanner;
         private Thread _fileScannerThread;
         private List<string> _supportedExtentions;
         
@@ -45,8 +45,8 @@ namespace MediaPlayer
             _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
             _mediaElementPollingTimer.Start();
 
-            _databaseController = new DatabaseControllerStub();
-            _fileScanner = new FileScannerStub(this);
+            _databaseController = new DatabaseController();
+            _fileScanner = new FileScanner(this);
 
             _fileScannerThread = new Thread(new ParameterizedThreadStart(_fileScanner.ScanDirectory ));
             _fileScannerThread.Start("C:\\");

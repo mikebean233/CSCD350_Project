@@ -36,10 +36,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>.\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Id3Lib">
-      <HintPath>..\Id3Lib.dll</HintPath>
+      <HintPath>.\Id3Lib.dll</HintPath>
     </Reference>
     <Reference Include="Mp3Lib">
       <HintPath>.\Mp3Lib.dll</HintPath>
@@ -75,8 +75,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DatabaseControllerStub.cs" />
-    <Compile Include="FileScannerStub.cs" />
+    <Compile Include="DatabaseController.cs" />
+    <Compile Include="FileScanner.cs" />
     <Compile Include="MainController.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

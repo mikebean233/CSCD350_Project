@@ -8,5 +8,6 @@ namespace MediaPlayer
 {
     public enum PlayModeEnum
     {
+        Shuffle, Repeat, Random
     }
 }
