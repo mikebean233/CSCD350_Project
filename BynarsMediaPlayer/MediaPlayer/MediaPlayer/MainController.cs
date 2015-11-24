@@ -109,7 +109,7 @@ namespace MediaPlayer
         {
             //Console.WriteLine("Add media file: " + newMediaPath);
             Dictionary<string, string> tags = TagManager.GetMediaTags(newMediaPath);
-            _databaseController.addToLibrary(newMediaPath, tags["filename"], tags["title"], tags["duration"], tags["artist"], tags["album"]);
+            _databaseController.addToLibrary(newMediaPath, tags["filename"], tags["title"], tags["duration"], tags["artist"], tags["album"], tags["filetype"]);
         }
 
         public void FetchMediaLibraryData() { }

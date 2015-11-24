@@ -24,6 +24,7 @@ namespace MediaPlayer
                 _knownTags.Add("TPE2","artist");
                 _knownTags.Add("TLEN","duration");
                 _knownTags.Add("TOFN","filename");
+                _knownTags.Add("TFLT", "filetype");
             }
             _initialized = true;
         }
@@ -34,15 +35,9 @@ namespace MediaPlayer
             if(!_initialized)
                 Initialize();
             Dictionary<string, string> ID3Tags = new Dictionary<string, string>();
-            ID3Tags.Add("artist", "unkown");
-            ID3Tags.Add("title", "unkwnown");
-            ID3Tags.Add("year", "unknown");
-            ID3Tags.Add("album", "unknown");
-            ID3Tags.Add("id", "unknown");
-            ID3Tags.Add("duration", "unknown");
-            ID3Tags.Add("filename", "unknown.file");
-
-
+            foreach (string thisValue in _knownTags.Values)
+                ID3Tags[thisValue] = "unknown " + thisValue;
+            
             if (!string.IsNullOrEmpty(mediaPath))
             {
                 //determine the type of the file
