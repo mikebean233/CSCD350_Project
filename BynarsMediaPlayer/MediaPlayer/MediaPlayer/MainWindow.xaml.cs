@@ -26,38 +26,61 @@ namespace MediaPlayer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MainController _mainController;
+       //Variables
+        String mediaSource = "";
+
         public MainWindow()
         {
             InitializeComponent();
 
-            _mainController = new MainController(this);
+           //Set a Default Song for Testing.
+            mediaSource = "C:/Users/Lexi/Documents/2015-2016/SoftwareEngineering/MediaPlayer/TestingFile/Axwell Λ Ingrosso - On My Way.mp3";
+            me_MediaElement.Source = new Uri(mediaSource);
         }
 
         private void poly_PlayButton_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.PlayButtonPressed()), new object[] { });
+            me_MediaElement.Play();
+            //lbl_MetaData.Content = curMedia.getMetaData();
+            //prgBar_ScrubBar.Value = playedTime * 100;
+            //lbl_ScrubBarTime.Content = "" playedTime + " / " + totalTime;
         }
 
         private void poly_StopButton_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.StopButtonPressed()), new object[] { });
+            me_MediaElement.Stop();
         }
 
-        
+        private void poly_SkipForeward_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+        }
+
+        private void poly_SkipBackward_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+        }
+
         private void slider_VolumeControl_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.VolumeChanged()), new object[] { });
+            //Set the Volume
+            me_MediaElement.Volume = (double)slider_VolumeControl.Value;
+
+            //Image Change For Using Icons
+            if (slider_VolumeControl.Value == 0)
+            {
+                //rect_VolumeImage.Fill = imgBrushVolumeOff;
+            }
+
+            else
+            {
+                //rect_VolumeImage.Fill = imgBrushVolumeOn;
+            }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void changePlayingSpeed(object sender, MouseButtonEventArgs e)
         {
-            (new Thread(new ThreadStart(_mainController.Setup))).Start();
-        }
+            int defaultValue = 1;
 
-        private void Window_Closing(object sender, CancelEventArgs e)
-        {
-            this.Dispatcher.Invoke(new Action(() => _mainController.CloseWindow()), new object[] { });
+            me_MediaElement.SpeedRatio = (double)defaultValue;
         }
     }
 }
