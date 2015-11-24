@@ -35,7 +35,7 @@ namespace MediaPlayer
         public MainController(MainWindow view)
         {
             _view =  view;
-            _supportedExtentions = new List<string>() {"*mp3", "*m4a", "*mp4"};
+            _supportedExtentions = new List<string>() {"*mp3", "*wma", "*wmv", "*asf"};
         }
 
         public void Setup()
