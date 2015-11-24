@@ -28,51 +28,65 @@ namespace MediaPlayer
                 sqlCommand.ExecuteNonQuery();
             }
 
-            private void libraryToString()
+        private void libraryToString()
+        {
+            sqlCommand.CommandText = "SELECT * FROM library";
+
+            SQLiteDataReader reader = sqlCommand.ExecuteReader();
+
+            while (reader.Read())
+                Console.WriteLine(reader["Name"] + " " + reader["Path"] + " " + reader["FileType"] + " " + reader["Title"] + " " + reader["Durration"] + " " + reader["Artist"] + " " + reader["Album"] + reader["Position"]);
+        }
+
+        public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album)
+        {
+            addToLibrary(fileLocation,fileName,title,duration,Artist, Album, 0);
+        }
+
+        public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album, int Position)
+        {
+
+            sqlCommand.CommandText = "INSERT INTO library (Name, Path, FileType, Title, duration, Artist, Album, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+            sqlCommand.Parameters.Add("@Name", DbType.String).Value = fileName;
+            sqlCommand.Parameters.Add("@Path", DbType.String).Value = fileLocation;
+            sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileName.Substring(fileName.IndexOf("."), 4);
+            sqlCommand.Parameters.Add("@Title", DbType.String).Value = title;
+            sqlCommand.Parameters.Add("@duration", DbType.Int64).Value = duration;
+            sqlCommand.Parameters.Add("@Artist", DbType.String).Value = Artist;
+            sqlCommand.Parameters.Add("@Album", DbType.String).Value = Album;
+            sqlCommand.Parameters.Add("@Position", DbType.Int64).Value = Position;
+            try
             {
-                sqlCommand.CommandText = "SELECT * FROM library";
-
-                SQLiteDataReader reader = sqlCommand.ExecuteReader();
-
-                while (reader.Read())
-                    Console.WriteLine(reader["Name"] + " " + reader["Path"] + " " + reader["FileType"] + " " + reader["Title"] + " " + reader["Durration"] + " " + reader["Artist"] + " " + reader["Album"]);
+                sqlCommand.ExecuteNonQuery();
             }
-
-            public void addToLibrary(String fileLocation, String fileName, String title, String duration, String Artist, String Album, String fileType)
+            catch (SQLiteException sqle)
             {
-                try
-                {
-                    sqlCommand.CommandText = "INSERT INTO library (Name, Path, FileType, Title, Duration, Artist, Album) VALUES (?, ?, ?, ?, ?, ?, ?);";
-                    sqlCommand.Parameters.Add("@Name", DbType.String).Value = fileName;
-                    sqlCommand.Parameters.Add("@Path", DbType.String).Value = fileLocation;
-                    sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileType;
-                    sqlCommand.Parameters.Add("@Title", DbType.String).Value = title;
-                    sqlCommand.Parameters.Add("@Durration", DbType.String).Value = duration;
-                    sqlCommand.Parameters.Add("@Artist", DbType.String).Value = Artist;
-                    sqlCommand.Parameters.Add("@Album", DbType.String).Value = Album;
-                    sqlCommand.ExecuteNonQuery();
-                }
-                catch (SQLiteException sqle)
-                {
-                    if (sqle.ErrorCode == 19)
-                        ; //carry on
-                    else
-                        throw sqle;
-                }
+                if (sqle.ErrorCode == 19)
+                    ; //carry on
+                else
+                    throw sqle;
+            }            
+        }
 
-
-
-            }
-
-            public void addToPlaylist(String Playlist, String id)
+        public void addToPlaylist(String Playlist, String id)
             {
                 throw new NotImplementedException();
             }
             public void retrievePlaylistToDataGrid(System.Windows.Controls.DataGrid target)
             {
-                throw new NotImplementedException();
+                sqlCommand.CommandText = "SELECT * FROM library";
+
+
+
+                DataSet dataSet = new DataSet();
+                SQLiteDataAdapter adapter = new SQLiteDataAdapter(sqlCommand);
+
+                adapter.Fill(dataSet);
+                target.ItemsSource = dataSet.Tables[0].DefaultView;
+
+
             }
 
-        }
+    }
 }
 
