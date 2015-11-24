@@ -26,61 +26,38 @@ namespace MediaPlayer
     /// </summary>
     public partial class MainWindow : Window
     {
-       //Variables
-        String mediaSource = "";
-
+        private MainController _mainController;
         public MainWindow()
         {
             InitializeComponent();
 
-           //Set a Default Song for Testing.
-            mediaSource = "C:/Users/Lexi/Documents/2015-2016/SoftwareEngineering/MediaPlayer/TestingFile/Axwell Λ Ingrosso - On My Way.mp3";
-            me_MediaElement.Source = new Uri(mediaSource);
+            _mainController = new MainController(this);
         }
 
         private void poly_PlayButton_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            me_MediaElement.Play();
-            //lbl_MetaData.Content = curMedia.getMetaData();
-            //prgBar_ScrubBar.Value = playedTime * 100;
-            //lbl_ScrubBarTime.Content = "" playedTime + " / " + totalTime;
+            this.Dispatcher.Invoke(new Action(() => _mainController.PlayButtonPressed()), new object[] { });
         }
 
         private void poly_StopButton_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            me_MediaElement.Stop();
+            this.Dispatcher.Invoke(new Action(() => _mainController.StopButtonPressed()), new object[] { });
         }
 
-        private void poly_SkipForeward_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-        }
-
-        private void poly_SkipBackward_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-        }
-
+        
         private void slider_VolumeControl_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            //Set the Volume
-            me_MediaElement.Volume = (double)slider_VolumeControl.Value;
-
-            //Image Change For Using Icons
-            if (slider_VolumeControl.Value == 0)
-            {
-                //rect_VolumeImage.Fill = imgBrushVolumeOff;
-            }
-
-            else
-            {
-                //rect_VolumeImage.Fill = imgBrushVolumeOn;
-            }
+            this.Dispatcher.Invoke(new Action(() => _mainController.VolumeChanged()), new object[] { });
         }
 
-        private void changePlayingSpeed(object sender, MouseButtonEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            int defaultValue = 1;
+            (new Thread(new ThreadStart(_mainController.Setup))).Start();
+        }
 
-            me_MediaElement.SpeedRatio = (double)defaultValue;
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.CloseWindow()), new object[] { });
         }
     }
 }
