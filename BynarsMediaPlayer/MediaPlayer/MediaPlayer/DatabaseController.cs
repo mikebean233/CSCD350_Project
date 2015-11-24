@@ -43,13 +43,13 @@ namespace MediaPlayer
             addToLibrary(fileLocation,fileName,title,duration,Artist, Album, 0);
         }
 
-        public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album, int Position)
+        public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album, string fileType, int Position)
         {
 
             sqlCommand.CommandText = "INSERT INTO library (Name, Path, FileType, Title, duration, Artist, Album, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
             sqlCommand.Parameters.Add("@Name", DbType.String).Value = fileName;
             sqlCommand.Parameters.Add("@Path", DbType.String).Value = fileLocation;
-            sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileName.Substring(fileName.IndexOf("."), 4);
+            sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileType;
             sqlCommand.Parameters.Add("@Title", DbType.String).Value = title;
             sqlCommand.Parameters.Add("@duration", DbType.Int64).Value = duration;
             sqlCommand.Parameters.Add("@Artist", DbType.String).Value = Artist;
