@@ -81,7 +81,7 @@ namespace MediaPlayer
             }
             catch (Exception e)
             {
-                Console.Out.Write("" + e);
+                //Console.Out.Write("" + e);
             }
 
             return files;

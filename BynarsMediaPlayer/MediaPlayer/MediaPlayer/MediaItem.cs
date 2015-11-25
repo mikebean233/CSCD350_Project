@@ -12,11 +12,12 @@ namespace MediaPlayer
         public string Title { get; set; }
         public string Year { get; set; }
         public string Artist { get; set; }
-        public string Id { get; set; }
-        public string Duration { get; set; }
+        // public string Id { get; set; }
+        public int Duration { get; set; }
         public string Filename { get; set; }
         public string Filetype { get; set; }
         public string Filepath { get; set; }
+        public int Position { get; set; }
 
         public MediaItem(string path)
         {
@@ -38,7 +39,7 @@ namespace MediaPlayer
             if(string.IsNullOrEmpty(Filepath) || (obj.GetType() != this.GetType()))
                 return false;
 
-            return Filepath.Equals((string)obj);
+            return Filepath.Equals(((MediaItem)obj).Filepath);
         }
 
         public override string ToString()

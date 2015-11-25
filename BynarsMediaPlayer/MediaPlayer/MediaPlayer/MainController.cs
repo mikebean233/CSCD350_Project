@@ -60,10 +60,14 @@ namespace MediaPlayer
             _mediaElementPollingTimer.Start();
 
             _databaseController = new DatabaseController();
-            _fileScanner = new FileScanner(this);
+            _mediaLibrary.AddRange(_databaseController.GetMediaItemsFromDatabase());
+            if (!_mediaLibrary.Any())
+            {
+                _fileScanner = new FileScanner(this);
+                _fileScannerThread = new Thread(new ParameterizedThreadStart(_fileScanner.ScanDirectory));
+                _fileScannerThread.Start("C:\\");
+            }
 
-            _fileScannerThread = new Thread(new ParameterizedThreadStart(_fileScanner.ScanDirectory ));
-            _fileScannerThread.Start("C:\\");
             /**
              *   TODO:
              *      1) load serialized state from savedState.cfg (in current directory)
@@ -85,6 +89,10 @@ namespace MediaPlayer
              */
         }
 
+        public void UpdateDataGrids()
+        {
+            
+        }
 
         
         /// <summary>
@@ -105,7 +113,7 @@ namespace MediaPlayer
 
         public void CheckMediaObjectStatus()
         {
-            Console.WriteLine("Check Status");
+           // Console.WriteLine("Check Status");
             if (_mediaElement != null)
             {
                 // TODO: Update the view (the progress bar and timer)
@@ -121,31 +129,48 @@ namespace MediaPlayer
         // (or possibly another piece of code) when a new file needs to be added to the library
         public void AddMediaEvent(string newMediaPath)
         {
-            //Console.WriteLine("Add media file: " + newMediaPath);
-
-            Dictionary<string, string> tags = TagManager.GetMediaTags(newMediaPath);
-            int duration = 0;
-            try{Int32.Parse(tags["duration"]);} catch (Exception e) { }
-
-            _databaseController.addToLibrary(newMediaPath, tags["filename"], tags["title"], duration, tags["artist"], tags["album"], tags["filetype"], 0);
-            
-            _view.Dispatcher.Invoke(new Action(() => _databaseController.retrievePlaylistToDataGrid(_view.dataGrid_MediaL)), new object[] { });
-
+            if (string.IsNullOrEmpty(newMediaPath))
+                return;
+            MediaItem thisItem = Utilities.BuildMediaItemFromPath(newMediaPath);
+            if (thisItem != null)
+            {
+                Console.WriteLine("Count: " + _mediaLibrary.AddNewMediaItem(thisItem));
+                _view.dataGrid_MediaL.DataContext = _mediaLibrary.GetMedia();
+            }
+            //_view.Dispatcher.Invoke(new Action(() => _databaseController.retrievePlaylistToDataGrid(_view.dataGrid_MediaL)), new object[] { });
         }
 
         public void FetchMediaLibraryData() { }
 
         #region View Events
-        public void PlayButtonPressed() { Console.WriteLine("Play");}
-        public void StopButtonPressed() { Console.WriteLine("Stop");}
-        public void PauseButtonPressed() { Console.WriteLine("Pause");}
-        public void VolumeChanged() { Console.WriteLine("Volume");}
-        public void ProgressBarMovedByUser() { Console.WriteLine("ProgressBar");}
+        public void PlayButtonPressed()
+        {
+            //Console.WriteLine("Play");
+        }
+        public void StopButtonPressed()
+        {
+            Console.WriteLine("Stop");
+        }
+
+        public void PauseButtonPressed()
+        {
+            //Console.WriteLine("Pause");
+        }
+        public void VolumeChanged()
+        {
+            //Console.WriteLine("Volume");
+        }
+        public void ProgressBarMovedByUser()
+        {
+            //Console.WriteLine("ProgressBar");
+        }
 
         public void CloseWindow()
         {
-            Console.WriteLine("Close");
-            _fileScannerThread.Abort();
+            //Console.WriteLine("Close");
+            _databaseController.AddMediaItemsToDatabase(_mediaLibrary.GetMedia());
+            if(_fileScannerThread != null && _fileScannerThread.IsAlive)
+                _fileScannerThread.Abort();
             _mediaElementPollingTimer.Stop();
             _mediaElementPollingTimer.Close();
         }
@@ -154,9 +179,9 @@ namespace MediaPlayer
 
         public void DataGridRowSelected(IList items)
         {
-            _selectedLibraryFiles = new List<string>();
-            foreach(System.Data.DataRowView thisRow in items)
-                _selectedLibraryFiles.Add((string)thisRow.Row.ItemArray[1]);
+            //_selectedLibraryFiles = new List<string>();
+            //foreach(System.Data.DataRowView thisRow in items)
+            //    _selectedLibraryFiles.Add((string)thisRow.Row.ItemArray[1]);
 
             
         }

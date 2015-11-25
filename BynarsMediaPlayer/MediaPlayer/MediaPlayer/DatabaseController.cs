@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.IO;
 using System.Data;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Windows.Automation.Peers;
 
 namespace MediaPlayer
 {
     class DatabaseController
     {
-       SQLiteConnection sqlConnection;
-            SQLiteCommand sqlCommand;
+            private SQLiteConnection sqlConnection;
+            private SQLiteCommand sqlCommand;
 
             public DatabaseController()
             {
@@ -23,20 +25,51 @@ namespace MediaPlayer
 
                 sqlConnection = new SQLiteConnection("Data Source = media.DB;Version = 3");
                 sqlConnection.Open();
-                String sql = "CREATE TABLE IF NOT EXISTs library (Name VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration VARCHAR, Artist VARCHAR, Album VARCHAR, Position VARCHAR) ";
+                String sql = "CREATE TABLE IF NOT EXISTs library (FileName VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration VARCHAR, Artist VARCHAR, Album VARCHAR, Position VARCHAR) ";
                 sqlCommand = new SQLiteCommand(sql, sqlConnection);
                 sqlCommand.ExecuteNonQuery();
-            }
-
-        private void libraryToString()
-        {
-            sqlCommand.CommandText = "SELECT * FROM library";
-
-            SQLiteDataReader reader = sqlCommand.ExecuteReader();
-
-            while (reader.Read())
-                Console.WriteLine(reader["Name"] + " " + reader["Path"] + " " + reader["FileType"] + " " + reader["Title"] + " " + reader["Durration"] + " " + reader["Artist"] + " " + reader["Album"] + reader["Position"]);
         }
+
+        public List<MediaItem> GetMediaItemsFromDatabase()
+        {
+            List<MediaItem> items = new List<MediaItem>();
+            sqlCommand.CommandText = "SELECT * FROM library";
+            SQLiteDataReader reader = sqlCommand.ExecuteReader();//(new SQLiteCommand("SELECT * FROM library", sqlConnection)).ExecuteReader();
+            
+            while (reader.Read())
+            {
+                try
+                {
+                    MediaItem thisItem = new MediaItem((string) reader["Path"])
+                    {
+                        Album    = (string) reader["Album"],
+                        Artist   = (string) reader["Artist"],
+                        //Duration = (int) reader["Duration"],
+                        Filename = (string) reader["Filename"],
+                        //Filepath = (string) reader["Path"],
+                        Filetype = (string) reader["FileType"],
+                        //Position = (int)    reader["Position"],
+                        Title    = (string) reader["Title"]
+                    };
+                    items.Add(thisItem);
+                }
+                catch (Exception e)
+                {
+                    
+                }
+            }// end while
+            reader.Dispose();
+            return items;
+        }
+
+        public void AddMediaItemsToDatabase(ICollection<MediaItem> items)
+        {
+            if (items == null || !items.Any())
+                return;
+            foreach(MediaItem thisItem in items)
+                addToLibrary(thisItem.Filepath, thisItem.Filename, thisItem.Title, thisItem.Duration, thisItem.Artist, thisItem.Album, thisItem.Filetype,thisItem.Position );
+        }
+
 
         public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album)
         {
@@ -54,8 +87,8 @@ namespace MediaPlayer
         public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album, string fileType, int Position)
         {
 
-            sqlCommand.CommandText = "INSERT INTO library (Name, Path, FileType, Title, duration, Artist, Album, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-            sqlCommand.Parameters.Add("@Name", DbType.String).Value = fileName;
+            sqlCommand.CommandText = "INSERT INTO library (FileName, Path, FileType, Title, duration, Artist, Album, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+            sqlCommand.Parameters.Add("@FileName", DbType.String).Value = fileName;
             sqlCommand.Parameters.Add("@Path", DbType.String).Value = fileLocation;
             sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileType;
             sqlCommand.Parameters.Add("@Title", DbType.String).Value = title;

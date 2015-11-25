@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -37,12 +38,8 @@ namespace MediaPlayer
             }
             if (_library.Count == 1)
                 _currentItem = item;
-            _itemPointer.Dispose();
-            _itemPointer = _library.GetEnumerator();
-            while (_itemPointer.Current != null && !_itemPointer.Current.Equals(item))
-            {
-                _itemPointer.MoveNext();
-            }
+
+            ResetItemPointerToCurrent();
 
             return _library.Count;
         }
@@ -62,10 +59,8 @@ namespace MediaPlayer
             if (_currentItem.Equals(item))
                 GetNextSong();
             _library.Remove(item);
-            _itemPointer.Dispose();
-            _itemPointer = _library.GetEnumerator();
-            _itemPointer.MoveNext();
-            while (!_itemPointer.Current.Equals(_currentItem)){_itemPointer.MoveNext();}
+
+           ResetItemPointerToCurrent();
 
             return _library.Count;
         }
@@ -73,6 +68,33 @@ namespace MediaPlayer
         public MediaItem GetCurrentSong()
         {
             return _currentItem;
+        }
+
+        public List<MediaItem> GetMedia()
+        {
+            return _library.ToList();
+        } 
+
+        public bool Any() { return _library.Any();}
+        public int Count{get{return _library.Count;} }
+
+        public int AddRange(ICollection<MediaItem> items)
+        {
+            if (items == null || !items.Any())
+                return _library.Count;
+
+            foreach (MediaItem thisItem in items)
+                _library.Add(thisItem);
+            ResetItemPointerToCurrent();
+
+            return _library.Count;
+        }
+
+        private void ResetItemPointerToCurrent()
+        {
+            _itemPointer.Dispose();
+            _itemPointer = _library.GetEnumerator();
+            while(!_itemPointer.MoveNext() && !_itemPointer.Current.Equals(_currentItem)) { }
         }
 
         public MediaItem GetNextSong()
