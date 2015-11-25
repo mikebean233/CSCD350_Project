@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -70,6 +72,12 @@ namespace MediaPlayer
                             + "The next button will go to the next media, while the previous will" + Environment.NewLine
                             + "go to the previous media.  There is also two sliders to control the" + Environment.NewLine
                             + "position of the media, and the volume of playback.");
+        }
+
+        private void DataGrid_MediaL_OnSelected(object sender, RoutedEventArgs e)
+        {
+            IList items = this.dataGrid_MediaL.SelectedItems;
+            this.Dispatcher.Invoke(new Action(() => _mainController.DataGridRowSelected(items)), new object[] { });
         }
     }
 }
