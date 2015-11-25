@@ -100,7 +100,7 @@
                         <ColumnDefinition Width="186*"/>
                         <ColumnDefinition Width="481*"/>
                     </Grid.ColumnDefinitions>
-                    <DataGrid x:Name="dataGrid_MediaL" HorizontalAlignment="Left" VerticalAlignment="Top" Height="415" Width="657" Grid.ColumnSpan="2"/>
+                    <DataGrid x:Name="dataGrid_MediaL" HorizontalAlignment="Left" VerticalAlignment="Top" Height="415" Width="657" Grid.ColumnSpan="2" SelectionChanged="DataGrid_MediaL_OnSelected"/>
 
                 </Grid>
             </TabItem>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,22 +23,33 @@ namespace MediaPlayer
     class MainController
     {
         private MainWindow _view;
-        private int _selectedMedia;
+        private string _currentMedia;
         private int _volume; // 1 - 100
         private PlayModeEnum _playMode;
+
+        public PlayModeEnum PlayMode
+        {
+            get { return _playMode; }
+        }
+
         private MediaElement _mediaElement;
         private Timer _mediaElementPollingTimer;
         private DatabaseController _databaseController;
         private FileScanner _fileScanner;
         private Thread _fileScannerThread;
         private List<string> _supportedExtentions;
-        
+
+        private MediaLibrary _mediaLibrary;
+
+        // private List<string> _selectedLibraryFiles;
+         
         public List<string> SupportedExtentions { get { return _supportedExtentions; } } 
 
         public MainController(MainWindow view)
         {
             _view =  view;
             _supportedExtentions = new List<string>() {"*mp3", "*wma", "*wmv", "*asf"};
+            _mediaLibrary = new MediaLibrary("Media Library", this);
         }
 
         public void Setup()
@@ -139,6 +151,16 @@ namespace MediaPlayer
         }
         public void MediaCompleted() { }
         public void MediaFileError() { }
+
+        public void DataGridRowSelected(IList items)
+        {
+            _selectedLibraryFiles = new List<string>();
+            foreach(System.Data.DataRowView thisRow in items)
+                _selectedLibraryFiles.Add((string)thisRow.Row.ItemArray[1]);
+
+            
+        }
+        
         #endregion View Events 
 
 
