@@ -49,7 +49,7 @@ namespace MediaPlayer
         
         private void slider_VolumeControl_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.VolumeChanged()), new object[] { });
+            this.Dispatcher.Invoke(new Action(() => _mainController.VolumeSliderChanged(this.slider_VolumeControl.Value)), new object[] { });
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -78,6 +78,26 @@ namespace MediaPlayer
         {
             IList items = this.dataGrid_MediaL.SelectedItems;
             this.Dispatcher.Invoke(new Action(() => _mainController.DataGridRowSelected(items)), new object[] { });
+        }
+
+        private void poly_SkipBackward_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] { });
+        }
+
+        private void poly_SkipForeward_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] { });
+        }
+
+        private void Slider_ScrubBar_OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
+        }
+
+        private void Poly_PauseButton_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.PauseButtonPressed()), new object[] { });
         }
     }
 }

@@ -54,7 +54,7 @@ namespace MediaPlayer
 
         public void Setup()
         {
-            _mediaElement = _view.mediaElement;
+            _mediaElement = _view.me_MediaElement;
             _mediaElementPollingTimer = new Timer(500); // Create a timer that polls every 1/2 second
             _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
             _mediaElementPollingTimer.Start();
@@ -135,7 +135,8 @@ namespace MediaPlayer
             if (thisItem != null)
             {
                 Console.WriteLine("Count: " + _mediaLibrary.AddNewMediaItem(thisItem));
-                _view.dataGrid_MediaL.DataContext = _mediaLibrary.GetMedia();
+               // _view.dataGrid_MediaL.DataContext = _mediaLibrary.GetMedia();
+                _view.Dispatcher.Invoke(new Action(() => _view.dataGrid_MediaL.DataContext = _mediaLibrary.GetMedia()), new object[] { });
             }
             //_view.Dispatcher.Invoke(new Action(() => _databaseController.retrievePlaylistToDataGrid(_view.dataGrid_MediaL)), new object[] { });
         }
@@ -143,9 +144,25 @@ namespace MediaPlayer
         public void FetchMediaLibraryData() { }
 
         #region View Events
+
+        public void SkipForwardButtonPressed()
+        {
+            Console.WriteLine("Skip Forward");
+        }
+
+        public void SkipBackwardButtonPressed()
+        {
+            Console.WriteLine("Skip Backward");
+        }
+
+        public void VolumeSliderChanged(double newValue)
+        {
+            Console.WriteLine("Volume Value: " + newValue);
+        }
+
         public void PlayButtonPressed()
         {
-            //Console.WriteLine("Play");
+            Console.WriteLine("Play");
         }
         public void StopButtonPressed()
         {
@@ -154,15 +171,12 @@ namespace MediaPlayer
 
         public void PauseButtonPressed()
         {
-            //Console.WriteLine("Pause");
+            Console.WriteLine("Pause");
         }
-        public void VolumeChanged()
+
+        public void ProgressBarMovedByUser(double newValue)
         {
-            //Console.WriteLine("Volume");
-        }
-        public void ProgressBarMovedByUser()
-        {
-            //Console.WriteLine("ProgressBar");
+            Console.WriteLine("ProgressBar Value: " + newValue);
         }
 
         public void CloseWindow()
@@ -182,8 +196,6 @@ namespace MediaPlayer
             //_selectedLibraryFiles = new List<string>();
             //foreach(System.Data.DataRowView thisRow in items)
             //    _selectedLibraryFiles.Add((string)thisRow.Row.ItemArray[1]);
-
-            
         }
         
         #endregion View Events 
