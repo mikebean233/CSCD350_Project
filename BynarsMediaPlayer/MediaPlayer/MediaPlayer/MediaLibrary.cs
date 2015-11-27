@@ -51,6 +51,7 @@ namespace MediaPlayer
 
             if (_library.Count == 1 && _library.Contains(item))
             {
+                _currentItem.IsPlaying = false;
                 _currentItem = null;
                 _itemPointer.Dispose();
                 _library.Remove(item);
@@ -101,11 +102,14 @@ namespace MediaPlayer
         {
             if (!_library.Any() || _mainController == null)
                 return null;
+            if (_currentItem != null)
+                _currentItem.IsPlaying = false;
             switch (_mainController.PlayMode)
             {
                 case PlayModeEnum.Consecutive:
                     if (!_itemPointer.MoveNext())
                     {
+                        
                         _itemPointer.Dispose();
                         _itemPointer = _library.GetEnumerator();
                         _itemPointer.MoveNext();
@@ -124,7 +128,8 @@ namespace MediaPlayer
                     _currentItem = _itemPointer.Current;
                 break;
             }
-
+            if(_currentItem != null)
+                _currentItem.IsPlaying = true;
             return _currentItem;
         }
 

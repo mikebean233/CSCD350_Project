@@ -18,12 +18,14 @@ namespace MediaPlayer
         public string Filetype { get; set; }
         public string Filepath { get; set; }
         public int Position { get; set; }
+        public bool IsPlaying { get; set; }
 
         public MediaItem(string path)
         {
             if (string.IsNullOrEmpty(path))
                 throw new Exception("An attempt was made to create a media item without a path");
             Filepath = path;
+            IsPlaying = false;
         }
 
         public override int GetHashCode()
