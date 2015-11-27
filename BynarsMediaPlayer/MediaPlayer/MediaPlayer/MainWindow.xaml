@@ -2,7 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:dg="http://schemas.microsoft.com/wpf/2008/toolkit"
-        Title="MainWindow" Height="570" Width="1307.75">
+        Title="MainWindow" Height="570" Width="1307.75"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
+
     <Window.Resources>
 
         <Style x:Key="SliderRepeatButton" TargetType="RepeatButton">
@@ -110,18 +113,39 @@
         </Canvas> -->
 
         <!-- Media -->
-        <MediaElement Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill" />
+        <MediaElement Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill"/>
 
         <Label x:Name="lbl_MetaData" Content="Metadata" HorizontalAlignment="Left" Margin="305,479,0,0" VerticalAlignment="Top" Height="51" Width="321" Foreground="#FFFDFDFD"/>
 
         <!-- Library -->
-        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="359">
+        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="361">
             <TabItem Header="TabItem">
                 <Grid Background="#FFE5E5E5" Margin="0,0,-6,0"/>
             </TabItem>
             <TabItem Header="Media Library" >
-                <Grid Background="#FFE5E5E5" Margin="0,0,-12,-3">
-                    <DataGrid x:Name="dataGrid_MediaL" HorizontalAlignment="Left" VerticalAlignment="Top" Height="415" Width="355" Grid.ColumnSpan="2" SelectionChanged="DataGrid_MediaL_OnSelected"/>
+                <Grid Background="#FFE5E5E5" Margin="0,0,11,-3">
+                    <DataGrid 
+                        x:Name="dataGrid_MediaL" 
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Top" 
+                        Height="394" 
+                        Width="344" 
+                        SelectionChanged="DataGrid_MediaL_OnSelected"
+                        >
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Playing"  Binding="{Binding IsPlaying}" />
+                            <DataGridTextColumn Header="Album"    Binding="{Binding Album}" />
+                            <DataGridTextColumn Header="Title"    Binding="{Binding Title}" />
+                            <DataGridTextColumn Header="year"     Binding="{Binding Year}" />
+                            <DataGridTextColumn Header="Artist"   Binding="{Binding Artist}" />
+                            <DataGridTextColumn Header="Duration" Binding="{Binding Duration}" />
+                            <DataGridTextColumn Header="Filename" Binding="{Binding Filename}" />
+                            <DataGridTextColumn Header="Filetype" Binding="{Binding Filetype}" />
+                            <DataGridTextColumn Header="Filepath" Binding="{Binding Filepath}" />
+                            <DataGridTextColumn Header="Position" Binding="{Binding Position}" />
+                        </DataGrid.Columns>
+
+                    </DataGrid>
 
                 </Grid>
             </TabItem>
@@ -153,7 +177,7 @@
                 <Point X="25" Y="5"></Point>
                 <Point X="25" Y="12"></Point>
                 <Point X="5" Y="12"></Point>
-                
+
                 <Point X="5" Y="17"></Point>
                 <Point X="25" Y="17"></Point>
                 <Point X="25" Y="25"></Point>

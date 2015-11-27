@@ -71,6 +71,7 @@
     </ApplicationDefinition>
     <Compile Include="MediaLibrary.cs" />
     <Compile Include="MediaItem.cs" />
+    <Compile Include="PlayState.cs" />
     <Compile Include="TagManager.cs" />
     <Compile Include="Utilities.cs" />
     <Page Include="MainWindow.xaml">
