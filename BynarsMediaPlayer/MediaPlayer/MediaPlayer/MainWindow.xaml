@@ -151,7 +151,7 @@
             </TabItem>
 
         </TabControl>
-        <Button x:Name="BTN_help" Style="{StaticResource ResourceKey=mediaButton}" Content="?" HorizontalAlignment="Center" Margin="658,496,642,0" VerticalAlignment="Top" Width="20" Height="20" Click="HelpBox" Foreground="#FFFBFBFB"/>
+        <Button x:Name="BTN_help" Style="{StaticResource ResourceKey=mediaButton}" Content="?" HorizontalAlignment="Center" Margin="676,479,602,0" VerticalAlignment="Top" Width="20" Height="20" Click="HelpBox" Foreground="#FFFBFBFB"/>
 
 
         <!-- Controls -->
@@ -228,6 +228,5 @@
             IsMoveToPointEnabled="False" Margin="701,480,0,39"
             ValueChanged="slider_VolumeControl_ValueChanged"
             Style="{StaticResource Horizontal_Slider}" />
-
-    </Grid>
+   </Grid>
 </Window>

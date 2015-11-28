@@ -73,21 +73,7 @@ namespace MediaPlayer
             /**
              *   TODO:
              *      1) load serialized state from savedState.cfg (in current directory)
-             *         - If error, setup default state and create/correct savedState.cfg
-             *     
-             *      2) Instantiate database controller
-             *         - Check to see of if there is a media library database, if not create one.
-             *
-             *      3) Check to see if there are records in the database
-             *         a) There are records: 
-             *            - Populate the media library control (the DataGridView)
-             *            - Load the last selected song as described in savedState.cfg (if the song is in the library)
-             *         b) There are no records: 
-             *            - Scan the entire file system for media files, as files are found, update the view as appropriate.           
-             *
-             *      2) Load the playlist data from the file ??????????? and update the view appropiately, 
-             *           
-             *      3) st 
+             *         - If error, setup default state and create/correct savedState.cfg 
              */
 
             _playState = PlayStateEnum.Stopped;
@@ -120,22 +106,13 @@ namespace MediaPlayer
         public void CheckMediaObjectStatus()
         {
            // Console.WriteLine("Check Status");
-            if (_mediaElement != null)
+            if (_mediaElement != null && _mediaElement.IsLoaded && _mediaElement.NaturalDuration.HasTimeSpan)
             {
                 // TODO: Update the view (the progress bar and timer)
-                //       Check to see if the media has finished, in which case move on the the next song (using the current play mode)
+                TimeSpan timeElapsed = _mediaElement.Position;
+                TimeSpan totalTime = _mediaElement.NaturalDuration.TimeSpan;
 
-                if (_mediaElement.IsLoaded && _mediaElement.Position.TotalMilliseconds == _mediaElement.Position.Duration().TotalMilliseconds)
-                {
-                    _currentItem = _mediaLibrary.GetNextSong();
-
-                    //_mediaElement.Source = new Uri(_currentItem.Filepath);
-                    if (_currentItem != null)
-                        _mediaElement.Source = new Uri(_currentItem.Filepath);
-
-                }
-                
-
+                _view.lbl_ScrubBarTime.Content = Utilities.BuildStringFromTimeSpan(timeElapsed) + "/" + Utilities.BuildStringFromTimeSpan(totalTime);
 
             }
 
@@ -164,6 +141,14 @@ namespace MediaPlayer
 
         #region View Events
 
+        public void MediaEnded()
+        {
+            _currentItem = _mediaLibrary.GetNextSong();
+
+            if (_currentItem != null)
+                _mediaElement.Source = new Uri(_currentItem.Filepath);
+        }
+
         public void SkipForwardButtonPressed()
         {
             Console.WriteLine("Skip Forward");
@@ -183,6 +168,7 @@ namespace MediaPlayer
         {
             //   Console.WriteLine("Play");
             _mediaElement.Play();
+            _playState = PlayStateEnum.Playing;
         }
         public void StopButtonPressed()
         {
@@ -216,8 +202,11 @@ namespace MediaPlayer
         public void DataGridRowSelected(IList items)
         {
             if (items != null && items.Count != 0)
-                _mediaElement.Source = new Uri( ((MediaItem)items[0]).Filepath);
-
+            {
+                string path = ((MediaItem)items[0]).Filepath;
+                _mediaElement.Source = new Uri(path);
+                _mediaElement.Play();
+            }
             //_selectedLibraryFiles = new List<string>();
             //foreach(System.Data.DataRowView thisRow in items)
             //    _selectedLibraryFiles.Add((string)thisRow.Row.ItemArray[1]);

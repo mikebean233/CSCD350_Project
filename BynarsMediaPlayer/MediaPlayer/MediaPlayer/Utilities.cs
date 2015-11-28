@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.PerformanceData;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -37,5 +38,20 @@ namespace MediaPlayer
 
             return thisItem;
         }
+
+        public static string BuildStringFromTimeSpan(TimeSpan input)
+        {
+            if (input == null)
+                return "0:00:00";
+            string seconds = ((int)input.TotalSeconds % 60).ToString();
+            string minutes = ((int)input.TotalMinutes % 60).ToString();
+            string hours = ((int)input.TotalHours % 24).ToString();
+
+            if (seconds.Length == 1) seconds = "0" + seconds;
+            if (minutes.Length == 1) minutes = "0" + minutes;
+
+            return hours + ":" + minutes + ":" + seconds;
+        }
+
     }
 }
