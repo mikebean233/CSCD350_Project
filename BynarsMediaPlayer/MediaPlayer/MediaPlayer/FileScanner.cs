@@ -9,11 +9,11 @@ using System.Collections.Specialized;
 
 namespace MediaPlayer
 {
-    class FileScannerStub
+    class FileScanner
     {
         private static MainController _mainController;
 
-        public FileScannerStub(MainController mainController)
+        public FileScanner(MainController mainController)
         {
             _mainController = mainController;
         }
@@ -81,7 +81,7 @@ namespace MediaPlayer
             }
             catch (Exception e)
             {
-                Console.Out.Write("" + e);
+                //Console.Out.Write("" + e);
             }
 
             return files;

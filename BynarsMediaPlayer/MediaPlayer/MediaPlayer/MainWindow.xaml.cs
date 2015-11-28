@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -47,7 +49,7 @@ namespace MediaPlayer
         
         private void slider_VolumeControl_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.VolumeChanged()), new object[] { });
+            this.Dispatcher.Invoke(new Action(() => _mainController.VolumeSliderChanged(this.slider_VolumeControl.Value)), new object[] { });
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -58,6 +60,44 @@ namespace MediaPlayer
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.CloseWindow()), new object[] { });
+        }
+
+        private void HelpBox(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Bynars Media Player" + Environment.NewLine
+                            + "Version 1.0" + Environment.NewLine
+                            + "by: Micheal Peterson, Travis Heppner, Lexi Guches" + Environment.NewLine
+                            + "To use soft ware go to the library tab and add media to the playlist." + Environment.NewLine
+                            + "Then hit the play button in order to start the media playlist. " + Environment.NewLine
+                            + "The next button will go to the next media, while the previous will" + Environment.NewLine
+                            + "go to the previous media.  There is also two sliders to control the" + Environment.NewLine
+                            + "position of the media, and the volume of playback.");
+        }
+
+        private void DataGrid_MediaL_OnSelected(object sender, RoutedEventArgs e)
+        {
+            IList items = this.dataGrid_MediaL.SelectedItems;
+            this.Dispatcher.Invoke(new Action(() => _mainController.DataGridRowSelected(items)), new object[] { });
+        }
+
+        private void poly_SkipBackward_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] { });
+        }
+
+        private void poly_SkipForeward_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] { });
+        }
+
+        private void Slider_ScrubBar_OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
+        }
+
+        private void Poly_PauseButton_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.PauseButtonPressed()), new object[] { });
         }
     }
 }

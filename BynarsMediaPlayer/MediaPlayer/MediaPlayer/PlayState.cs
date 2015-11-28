@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace MediaPlayer
 {
-    public enum PlayModeEnum
+    public enum PlayStateEnum
     {
-        Shuffle, Repeat, Consecutive
+        Playing, Paused, Stopped
     }
 }
