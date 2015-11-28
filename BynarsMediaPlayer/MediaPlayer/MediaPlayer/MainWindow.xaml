@@ -119,7 +119,7 @@
 
         <!-- Library -->
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="361">
-            <TabItem Header="TabItem">
+            <TabItem Header="Playlist 1">
                 <Grid Background="#FFE5E5E5" Margin="0,0,-6,0"/>
             </TabItem>
             <TabItem Header="Media Library" >
@@ -219,11 +219,11 @@
 
         <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="67,480,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
 
-        <Slider Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Style="{StaticResource Horizontal_Slider}" PreviewMouseUp="Slider_ScrubBar_OnPreviewMouseUp"/>
+        <Slider Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" PreviewMouseUp="Slider_ScrubBar_OnPreviewMouseUp"/>
 
         <Slider x:Name="slider_VolumeControl" Width="200" Value="0" Orientation="Horizontal" HorizontalAlignment="Left" 
-            IsSnapToTickEnabled="False" Minimum="0" Maximum="5" TickPlacement="BottomRight" 
-            AutoToolTipPlacement="BottomRight" TickFrequency="1"
+            IsSnapToTickEnabled="False" Minimum="0" Maximum="1" TickPlacement="BottomRight" 
+            AutoToolTipPlacement="BottomRight"
             AutoToolTipPrecision="2" IsDirectionReversed="False"
             IsMoveToPointEnabled="False" Margin="701,480,0,39"
             ValueChanged="slider_VolumeControl_ValueChanged"
