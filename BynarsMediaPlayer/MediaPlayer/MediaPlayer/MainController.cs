@@ -62,7 +62,7 @@ namespace MediaPlayer
             {
                 _fileScanner = new FileScanner(this);
                 _fileScannerThread = new Thread(new ParameterizedThreadStart(_fileScanner.ScanDirectory));
-                _fileScannerThread.Start("C:\\Users\\Michael\\Desktop");
+                _fileScannerThread.Start("C:\\");
             }
             UpdateDataGrids();
 
@@ -105,17 +105,17 @@ namespace MediaPlayer
 
         public void CheckMediaObjectStatus()
         {
-           // Console.WriteLine("Check Status");
-            if (_mediaElement != null && _mediaElement.IsLoaded && _mediaElement.NaturalDuration.HasTimeSpan)
+           if (_mediaElement != null && _mediaElement.IsLoaded && _mediaElement.NaturalDuration.HasTimeSpan)
             {
-                // TODO: Update the view (the progress bar and timer)
+                // Update Time Label
                 TimeSpan timeElapsed = _mediaElement.Position;
                 TimeSpan totalTime = _mediaElement.NaturalDuration.TimeSpan;
+               _view.lbl_ScrubBarTime.Content = Utilities.BuildStringFromTimeSpan(timeElapsed) + "/" + Utilities.BuildStringFromTimeSpan(totalTime);
 
-                _view.lbl_ScrubBarTime.Content = Utilities.BuildStringFromTimeSpan(timeElapsed) + "/" + Utilities.BuildStringFromTimeSpan(totalTime);
-
+                // Update Progress Slider
+                double completionRatio = timeElapsed.TotalMilliseconds/totalTime.TotalMilliseconds;
+                _view.slider_ScrubBar.Value = completionRatio;
             }
-
         }
 
         
@@ -161,7 +161,8 @@ namespace MediaPlayer
 
         public void VolumeSliderChanged(double newValue)
         {
-            Console.WriteLine("Volume Value: " + newValue);
+            //Console.WriteLine("Volume Value: " + newValue);
+            _view.me_MediaElement.Volume = newValue;
         }
 
         public void PlayButtonPressed()
