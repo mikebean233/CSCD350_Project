@@ -101,5 +101,10 @@ namespace MediaPlayer
         {
             Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
         }
+
+        private void Me_MediaElement_OnMediaEnded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.MediaEnded()), new object[] { });
+        }
     }
 }
