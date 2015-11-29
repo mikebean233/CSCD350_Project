@@ -1,23 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MediaPlayer
 {
-    class MediaItem
+    [DataContract]
+    public class MediaItem
     {
+        [DataMember]
         public string Album { get; set; }
+        [DataMember]
         public string Title { get; set; }
+        [DataMember]
         public string Year { get; set; }
+        [DataMember]
         public string Artist { get; set; }
         // public string Id { get; set; }
+        [DataMember]
         public int Duration { get; set; }
+        [DataMember]
         public string Filename { get; set; }
+        [DataMember]
         public string Filetype { get; set; }
+        [DataMember]
         public string Filepath { get; set; }
+        [DataMember]
         public int Position { get; set; }
+        [DataMember]
         public bool IsPlaying { get; set; }
 
         public MediaItem(string path)

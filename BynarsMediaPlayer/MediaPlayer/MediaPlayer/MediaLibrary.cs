@@ -98,6 +98,16 @@ namespace MediaPlayer
             while(!_itemPointer.MoveNext() && !_itemPointer.Current.Equals(_currentItem)) { }
         }
 
+        public bool SetCurrentMedia(MediaItem newCurrent)
+        {
+            if (!_library.Any() || newCurrent == null || !_library.Contains(newCurrent))
+                return false;
+
+            _itemPointer.Reset();
+            _itemPointer.MoveNext();
+            while (!_itemPointer.Current.Equals(newCurrent)) { _itemPointer.MoveNext();}
+            return true;
+        }
         public MediaItem GetNextSong()
         {
             if (!_library.Any() || _mainController == null)

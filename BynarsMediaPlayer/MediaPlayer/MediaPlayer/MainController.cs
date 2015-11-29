@@ -1,32 +1,30 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Timers;
-using System.Windows;
 using Timer = System.Timers.Timer;
-using ICSharpCode;
-using ICSharpCode.SharpZipLib;
 using System.IO;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
-using Id3Lib;
-using Mp3Lib;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization.Json;
+
 namespace MediaPlayer
 {
-
+    [DataContract]
     class MainController
     {
         private MainWindow _view;
+        [DataMember]
         private MediaItem _currentItem;
+        [DataMember]
         private int _volume; // 1 - 100
+        [DataMember]
         private PlayModeEnum _playMode;
+        [DataMember]
         private PlayStateEnum _playState;
+        //[DataMember]
         public PlayModeEnum PlayMode
         {
             get { return _playMode; }
@@ -41,6 +39,8 @@ namespace MediaPlayer
 
         private MediaLibrary _mediaLibrary;
         private bool _timerIsChangingScrubBar;
+        [DataMember]
+        private string _stateCaptureFileName;
 
         // private List<string> _selectedLibraryFiles;
          
@@ -51,6 +51,8 @@ namespace MediaPlayer
             _view =  view;
             _supportedExtentions = new List<string>() {"*mp3", "*wma", "*wmv", "*asf"};
             _mediaLibrary = new MediaLibrary("Media Library", this);
+            _stateCaptureFileName = "savedState.cfg";
+            _playMode = PlayModeEnum.Consecutive; 
         }
 
         public void Setup()
@@ -159,6 +161,7 @@ namespace MediaPlayer
         public void SkipForwardButtonPressed()
         {
             Console.WriteLine("Skip Forward");
+            MediaEnded();
         }
 
         public void SkipBackwardButtonPressed()
@@ -215,22 +218,27 @@ namespace MediaPlayer
         public void CloseWindow()
         {
             //Console.WriteLine("Close");
+            // serialize the current state of this class
+
+            SerializeThis(this, _stateCaptureFileName);
             _databaseController.AddMediaItemsToDatabase(_mediaLibrary.GetMedia());
             if(_fileScannerThread != null && _fileScannerThread.IsAlive)
                 _fileScannerThread.Abort();
             _mediaElementPollingTimer.Stop();
             _mediaElementPollingTimer.Close();
         }
-        public void MediaCompleted() { }
         public void MediaFileError() { }
 
         public void DataGridRowSelected(IList items)
         {
             if (items != null && items.Count != 0)
             {
-                string path = ((MediaItem)items[0]).Filepath;
-                _mediaElement.Source = new Uri(path);
-                _mediaElement.Play();
+                MediaItem selectedMedia = ((MediaItem) items[0]);
+                _currentItem = selectedMedia;
+                _mediaElement.Source = new Uri(selectedMedia.Filepath);
+                _mediaLibrary.SetCurrentMedia(selectedMedia);
+                if (_playState == PlayStateEnum.Playing)
+                    _mediaElement.Play();
             }
             //_selectedLibraryFiles = new List<string>();
             //foreach(System.Data.DataRowView thisRow in items)
@@ -239,7 +247,33 @@ namespace MediaPlayer
         
         #endregion View Events 
 
+        public static bool SerializeThis(MainController mainController, string outputPath)
+        {
+            if (mainController != null && !string.IsNullOrEmpty(outputPath))
+            {
+                try
+                {
+                    IFormatter formatter = new BinaryFormatter();
+                    Stream stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                    //formatter.Serialize(stream, mainController);
+                    //stream.Close();
 
+                    //MemoryStream stream1 = new MemoryStream();
+                    DataContractJsonSerializer ser = new DataContractJsonSerializer(mainController.GetType() );
+                    ser.WriteObject(stream, mainController);
+                    stream.Close();
+
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+            
+            }
+            return false;
+        }
 
     }
 }
