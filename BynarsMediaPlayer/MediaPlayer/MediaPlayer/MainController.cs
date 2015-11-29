@@ -40,6 +40,7 @@ namespace MediaPlayer
         private List<string> _supportedExtentions;
 
         private MediaLibrary _mediaLibrary;
+        private bool _timerIsChangingScrubBar;
 
         // private List<string> _selectedLibraryFiles;
          
@@ -54,6 +55,7 @@ namespace MediaPlayer
 
         public void Setup()
         {
+            _timerIsChangingScrubBar = false;
             _mediaElement = _view.me_MediaElement;
 
             _databaseController = new DatabaseController();
@@ -100,13 +102,17 @@ namespace MediaPlayer
 
         public void PollingTimerHandler(object sender, ElapsedEventArgs e)
         {
-            _view.Dispatcher.Invoke(new Action(() => CheckMediaObjectStatus()), new object[] { });
+            if (_playState == PlayStateEnum.Playing)
+            {
+                _timerIsChangingScrubBar = true;
+                _view.Dispatcher.Invoke(new Action(() => CheckMediaObjectStatus()), new object[] {});
+            }
         }
-
+        
         public void CheckMediaObjectStatus()
         {
            if (_mediaElement != null && _mediaElement.IsLoaded && _mediaElement.NaturalDuration.HasTimeSpan)
-            {
+           {
                 // Update Time Label
                 TimeSpan timeElapsed = _mediaElement.Position;
                 TimeSpan totalTime = _mediaElement.NaturalDuration.TimeSpan;
@@ -116,6 +122,7 @@ namespace MediaPlayer
                 double completionRatio = timeElapsed.TotalMilliseconds/totalTime.TotalMilliseconds;
                 _view.slider_ScrubBar.Value = completionRatio;
             }
+            _timerIsChangingScrubBar = false;
         }
 
         
@@ -181,11 +188,28 @@ namespace MediaPlayer
         {
             //Console.WriteLine("Pause");
             _mediaElement.Pause();
+            _playState = PlayStateEnum.Paused;
         }
 
         public void ProgressBarMovedByUser(double newValue)
         {
-            Console.WriteLine("ProgressBar Value: " + newValue);
+            if (!_timerIsChangingScrubBar && _mediaElement.NaturalDuration.HasTimeSpan)
+            {
+                _mediaElementPollingTimer.Enabled = false;
+
+                //    Console.WriteLine("ProgressBar Value: " + newValue);
+                TimeSpan totalTime = _mediaElement.NaturalDuration.TimeSpan;
+                int milliseconds   = (int)(totalTime.TotalMilliseconds * newValue) % 1000;
+                int seconds        = (int)(totalTime.TotalSeconds      * newValue) % 60;
+                int minutes        = (int)(totalTime.TotalMinutes      * newValue) % 60;
+                int hours          = (int)(totalTime.TotalHours        * newValue) % 24;
+                int days           = 0;
+                _mediaElement.Position = new TimeSpan(days, hours, minutes, seconds, milliseconds ); //_mediaElement.NaturalDuration.*newValue);
+                
+                TimeSpan timeElapsed = _mediaElement.Position;
+                _view.lbl_ScrubBarTime.Content = Utilities.BuildStringFromTimeSpan(timeElapsed) + "/" + Utilities.BuildStringFromTimeSpan(totalTime);
+                _mediaElementPollingTimer.Enabled = true;
+            }
         }
 
         public void CloseWindow()
