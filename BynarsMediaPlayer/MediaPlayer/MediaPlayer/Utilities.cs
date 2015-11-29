@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.PerformanceData;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization.Json;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +56,36 @@ namespace MediaPlayer
             if (minutes.Length == 1) minutes = "0" + minutes;
 
             return hours + ":" + minutes + ":" + seconds;
+        }
+
+        public static bool SerializeObjectToJson<T>(string outputFileName, T obj)
+        {
+            try
+            {
+                IFormatter formatter = new BinaryFormatter();
+                Stream stream = new FileStream(outputFileName, FileMode.Create, FileAccess.Write, FileShare.None);
+
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(T));
+                serializer.WriteObject(stream, obj);
+                stream.Close();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        public static T DeserializeObjectFromJson<T>(string inputFileName)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(inputFileName, FileMode.Open, FileAccess.Read, FileShare.None);
+
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(T));
+            T outputObject = (T) serializer.ReadObject(stream);
+            stream.Close();
+            return outputObject;
         }
 
     }

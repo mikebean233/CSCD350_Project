@@ -134,14 +134,17 @@
                 <Grid Background="#FFE5E5E5" Margin="0,0,-6,0"/>
             </TabItem>
             <TabItem Header="Media Library" >
-                <Grid Background="#FFE5E5E5" Margin="0,0,11,-3">
+                <Grid Background="#FFE5E5E5" Margin="0,0,11,-3" MaxHeight="394" MaxWidth="344">
                     <DataGrid 
                         x:Name="dataGrid_MediaL" 
                         HorizontalAlignment="Left" 
                         VerticalAlignment="Top" 
+                        MaxHeight="394"
+                        MaxWidth="344"
                         Height="394" 
                         Width="344" 
                         SelectionChanged="DataGrid_MediaL_OnSelected"
+                        
                         >
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Playing"  Binding="{Binding IsPlaying}" />
