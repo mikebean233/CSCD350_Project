@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -41,6 +42,7 @@ namespace MediaPlayer
             this.Dispatcher.Invoke(new Action(() => _mainController.PlayButtonPressed()), new object[] { });
         }
 
+        
         private void poly_StopButton_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.StopButtonPressed()), new object[] { });
@@ -90,14 +92,14 @@ namespace MediaPlayer
             this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] { });
         }
 
-        private void Slider_ScrubBar_OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            this.Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
-        }
-
         private void Poly_PauseButton_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
             Dispatcher.Invoke(new Action(() => _mainController.PauseButtonPressed()), new object[] { });
+        }
+
+        private void slider_ScrubBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
         }
     }
 }

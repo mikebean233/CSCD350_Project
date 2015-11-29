@@ -33,19 +33,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <Style x:Key="SliderThumb" TargetType="Thumb">
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <Setter Property="OverridesDefaultStyle" Value="true" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-                        <Ellipse Height="10" Width="10" Fill="#FF0074AD"></Ellipse>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <ControlTemplate x:Key="Slider"  TargetType="Slider">
             <Grid>
                 <Grid.RowDefinitions>
@@ -67,7 +54,31 @@
             </Grid>
         </ControlTemplate>
 
+        <Style x:Key="crub" TargetType="Slider">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="MinHeight" Value="21" />
+                    <Setter Property="MinWidth" Value="104" />
+                    <Setter Property="Template" Value="{StaticResource Slider}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="Horizontal_Slider" TargetType="Slider">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="MinHeight" Value="21" />
+                    <Setter Property="MinWidth" Value="104" />
+                    <Setter Property="Template" Value="{StaticResource Slider}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="Scrubbar_slider" TargetType="Slider">
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="SnapsToDevicePixels" Value="true" />
             <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -219,7 +230,7 @@
 
         <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="67,480,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
 
-        <Slider Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" PreviewMouseUp="Slider_ScrubBar_OnPreviewMouseUp"/>
+        <Slider Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" ValueChanged="slider_ScrubBar_ValueChanged"/>
 
         <Slider x:Name="slider_VolumeControl" Width="200" Value="0" Orientation="Horizontal" HorizontalAlignment="Left" 
             IsSnapToTickEnabled="False" Minimum="0" Maximum="1" TickPlacement="BottomRight" 
