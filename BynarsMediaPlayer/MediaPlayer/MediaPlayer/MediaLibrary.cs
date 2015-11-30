@@ -37,7 +37,10 @@ namespace MediaPlayer
                 _library.Add(item);
             }
             if (_library.Count == 1)
+            {
                 _currentItem = item;
+                _currentItem.IsPlaying = true;
+            }
 
             ResetItemPointerToCurrent();
 
@@ -66,7 +69,7 @@ namespace MediaPlayer
             return _library.Count;
         }
 
-        public MediaItem GetCurrentSong()
+        public MediaItem GetCurrentMedia()
         {
             return _currentItem;
         }
@@ -83,6 +86,9 @@ namespace MediaPlayer
         {
             if (items == null || !items.Any())
                 return _library.Count;
+
+            if (_currentItem == null)
+                _currentItem = items.ToList()[0];
 
             foreach (MediaItem thisItem in items)
                 _library.Add(thisItem);
@@ -103,9 +109,16 @@ namespace MediaPlayer
             if (!_library.Any() || newCurrent == null || !_library.Contains(newCurrent))
                 return false;
 
+            if (_currentItem.Equals(newCurrent))
+                return true;
+            else
+                _currentItem.IsPlaying = false;
+
             _itemPointer.Reset();
             _itemPointer.MoveNext();
             while (!_itemPointer.Current.Equals(newCurrent)) { _itemPointer.MoveNext();}
+            _currentItem = _itemPointer.Current;
+            _currentItem.IsPlaying = true;
             return true;
         }
         public MediaItem GetNextSong()

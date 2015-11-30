@@ -28,7 +28,7 @@ namespace MediaPlayer
         [DataMember]
         public string Filepath { get; set; }
         [DataMember]
-        public int Position { get; set; }
+        public double Position { get; set; }
         [DataMember]
         public bool IsPlaying { get; set; }
 
@@ -38,6 +38,8 @@ namespace MediaPlayer
                 throw new Exception("An attempt was made to create a media item without a path");
             Filepath = path;
             IsPlaying = false;
+            Position = 0.0;
+            Duration = 0;
         }
 
         public override int GetHashCode()

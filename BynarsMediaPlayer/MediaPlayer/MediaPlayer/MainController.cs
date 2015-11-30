@@ -121,7 +121,8 @@ namespace MediaPlayer
         public void UpdateDataGrids()
         {
             //  _view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia();
-            _view.Dispatcher.Invoke(new Action(() => _view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
+            //_view.Dispatcher.Invoke(new Action(() => _view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
+            _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
             //_view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia();
         }
 
@@ -137,7 +138,7 @@ namespace MediaPlayer
         
         public void UpdateView()
         {
-            if (_mediaElement != null && _mediaElement.IsLoaded && _mediaElement.NaturalDuration.HasTimeSpan)
+            if (_mediaElement != null && _mediaElement.IsLoaded && _mediaElement.NaturalDuration.HasTimeSpan && _currentItem != null)
             {
                 // Update Time Label
                 TimeSpan timeElapsed = _mediaElement.Position;
@@ -148,7 +149,8 @@ namespace MediaPlayer
                 // Update Progress Slider
                 double completionRatio = timeElapsed.TotalMilliseconds/totalTime.TotalMilliseconds;
                 _view.slider_ScrubBar.Value = completionRatio;
-
+                _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
+                _currentItem.Position = completionRatio;
             }
             else
             {
@@ -182,6 +184,32 @@ namespace MediaPlayer
 
         public void FetchMediaLibraryData() { }
 
+        public bool ChangeCurrentMedia(MediaItem _newItem)
+        {
+            _mediaElementPollingTimer.Enabled = false;
+            if (_newItem == null)
+                return false;
+            try
+            {
+                if (!_mediaLibrary.SetCurrentMedia(_newItem))
+                    return false;
+                _currentItem = _mediaLibrary.GetCurrentMedia();
+                _mediaElement.Source = new Uri(_currentItem.Filepath);
+                if(_mediaElement.NaturalDuration.HasTimeSpan)
+                    _mediaElement.Position = new TimeSpan(0,0,0,0,(int)(_currentItem.Position * _mediaElement.NaturalDuration.TimeSpan.TotalMilliseconds));
+                if (_playState == PlayStateEnum.Playing)
+                    _mediaElement.Play();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            this._currentItem = _mediaLibrary.GetCurrentMedia();
+            _mediaElementPollingTimer.Enabled = true;
+            return true;
+        }
+
+
         #region View Events
 
         public void MediaEnded()
@@ -189,7 +217,7 @@ namespace MediaPlayer
             _currentItem = _mediaLibrary.GetNextSong();
 
             if (_currentItem != null)
-                _mediaElement.Source = new Uri(_currentItem.Filepath);
+                _mediaElement.Source = new Uri(_currentItem.Filepath);    
         }
 
         public void SkipForwardButtonPressed()
@@ -276,7 +304,19 @@ namespace MediaPlayer
             //foreach(System.Data.DataRowView thisRow in items)
             //    _selectedLibraryFiles.Add((string)thisRow.Row.ItemArray[1]);
         }
-        
+
+        public void PlaylistItemDoubleClicked(ListViewItem item)
+        {
+            MediaItem clickedItem = (MediaItem) (item.DataContext);
+
+            ChangeCurrentMedia(clickedItem);
+
+            //_mediaElement.Source = new Uri(clickedItem.Filepath);
+            //_mediaLibrary.SetCurrentMedia(clickedItem);
+            //if (_playState == PlayStateEnum.Playing)
+            //    _mediaElement.Play();
+        }
+
         #endregion View Events 
 
 
