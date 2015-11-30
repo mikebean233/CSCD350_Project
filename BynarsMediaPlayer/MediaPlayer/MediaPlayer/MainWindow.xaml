@@ -166,7 +166,11 @@
 
         </TabControl>
         <Button x:Name="BTN_help" Style="{StaticResource ResourceKey=mediaButton}" Content="?" HorizontalAlignment="Center" Margin="676,479,602,0" VerticalAlignment="Top" Width="20" Height="20" Click="HelpBox" Foreground="#FFFBFBFB"/>
-
+        <Button x:Name="BTN_playMode" Style="{StaticResource ResourceKey=mediaButton}" Content="C" Margin="674,0,601,12.5" Width="Auto" Background="#FFE6E1E1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="toggleShuffle" Height="22">
+            <Button.Effect>
+                <DropShadowEffect/>
+            </Button.Effect>
+        </Button>
 
         <!-- Controls -->
         <Polygon Name="poly_PlayButton" Fill="#323D98" Stroke="Black" Margin="37,479,879,10" MouseDown="poly_PlayButton_MouseDown">

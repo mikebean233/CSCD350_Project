@@ -122,6 +122,11 @@ namespace MediaPlayer
                 obj = VisualTreeHelper.GetParent(obj);
             }
         }
+         private void toggleShuffle(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.ShuffleToggled()), new object[] { });
+        }
     }
+
     }
 
