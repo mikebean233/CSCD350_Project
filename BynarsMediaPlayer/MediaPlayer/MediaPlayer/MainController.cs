@@ -122,6 +122,7 @@ namespace MediaPlayer
         {
             //  _view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia();
             _view.Dispatcher.Invoke(new Action(() => _view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
+            _view.Dispatcher.Invoke(new Action(() => _view.playlistGrid.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
             //_view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia();
         }
 
@@ -148,6 +149,7 @@ namespace MediaPlayer
                 // Update Progress Slider
                 double completionRatio = timeElapsed.TotalMilliseconds/totalTime.TotalMilliseconds;
                 _view.slider_ScrubBar.Value = completionRatio;
+                _view.Dispatcher.Invoke(new Action(() => _view.playlistGrid.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
 
             }
             else
@@ -190,6 +192,9 @@ namespace MediaPlayer
 
             if (_currentItem != null)
                 _mediaElement.Source = new Uri(_currentItem.Filepath);
+
+            
+            
         }
 
         public void SkipForwardButtonPressed()
