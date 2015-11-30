@@ -151,6 +151,20 @@ namespace MediaPlayer
                 _view.slider_ScrubBar.Value = completionRatio;
                 _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
                 _currentItem.Position = completionRatio;
+
+                // update the play mode toggle
+                switch (_playMode)
+                {
+                    case PlayModeEnum.Consecutive:
+                        _view.BTN_playMode.Content = "C";
+                        break;
+                    case PlayModeEnum.Repeat:
+                        _view.BTN_playMode.Content = "R";
+                        break;
+                    case PlayModeEnum.Shuffle:
+                        _view.BTN_playMode.Content = "S";
+                        break;
+                }
             }
             else
             {
