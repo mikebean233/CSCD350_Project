@@ -120,10 +120,7 @@ namespace MediaPlayer
 
         public void UpdateDataGrids()
         {
-            //  _view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia();
-            //_view.Dispatcher.Invoke(new Action(() => _view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
             _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
-            //_view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia();
         }
 
         public void PollingTimerHandler(object sender, ElapsedEventArgs e)
