@@ -45,7 +45,7 @@ namespace MediaPlayer
                         Album    = (string) reader["Album"],
                         Artist   = (string) reader["Artist"],
                         Duration = (long)   reader["Duration"],
-                        Filename = (string) reader["Filename"],
+                        Filename = (string) reader["FileName"],
                         Filetype = (string) reader["FileType"],
                         Position = (double) reader["Position"],
                         Title    = (string) reader["Title"]
