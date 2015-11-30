@@ -48,7 +48,7 @@ namespace MediaPlayer
                         Filename = (string) reader["Filename"],
                         //Filepath = (string) reader["Path"],
                         Filetype = (string) reader["FileType"],
-                        //Position = (int)    reader["Position"],
+                        Position = (double)    reader["Position"],
                         Title    = (string) reader["Title"]
                     };
                     items.Add(thisItem);
@@ -95,7 +95,7 @@ namespace MediaPlayer
             sqlCommand.Parameters.Add("@duration", DbType.Int64).Value = duration;
             sqlCommand.Parameters.Add("@Artist", DbType.String).Value = Artist;
             sqlCommand.Parameters.Add("@Album", DbType.String).Value = Album;
-            sqlCommand.Parameters.Add("@Position", DbType.Int64).Value = Position;
+            sqlCommand.Parameters.Add("@Position", DbType.Double).Value = Position;
             try
             {
                 sqlCommand.ExecuteNonQuery();
