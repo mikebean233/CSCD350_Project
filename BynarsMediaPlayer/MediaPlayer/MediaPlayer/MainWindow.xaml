@@ -132,52 +132,34 @@
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="361">
             <TabItem Header="Playlist 1">
                 <Grid Background="#FFE5E5E5" Margin="0,0,-6,0">
-                        <ListView Margin="10" Name="playlistGrid">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="Playing"  DisplayMemberBinding="{Binding IsPlaying}" />
-                                    <GridViewColumn Header="Album"    DisplayMemberBinding="{Binding Album}" />
-                                    <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}" />
-                                    <GridViewColumn Header="year"     DisplayMemberBinding="{Binding Year}" />
-                                    <GridViewColumn Header="Artist"   DisplayMemberBinding="{Binding Artist}" />
-                                    <GridViewColumn Header="Duration" DisplayMemberBinding="{Binding Duration}" />
-                                    <GridViewColumn Header="Filename" DisplayMemberBinding="{Binding Filename}" />
-                                    <GridViewColumn Header="Filetype" DisplayMemberBinding="{Binding Filetype}" />
-                                    <GridViewColumn Header="Filepath" DisplayMemberBinding="{Binding Filepath}" />
-                                    <GridViewColumn Header="Position" DisplayMemberBinding="{Binding Position}" />
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+
                     
                 </Grid>
             </TabItem>
             <TabItem Header="Media Library" >
                 <Grid Background="#FFE5E5E5" Margin="0,0,11,-3" MaxHeight="394" MaxWidth="344">
-                    <DataGrid 
-                        x:Name="dataGrid_MediaL" 
-                        HorizontalAlignment="Left" 
-                        VerticalAlignment="Top" 
-                        MaxHeight="394"
-                        MaxWidth="344"
-                        Height="394" 
-                        Width="344" 
-                        SelectionChanged="DataGrid_MediaL_OnSelected"
-                        
-                        >
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Playing"  Binding="{Binding IsPlaying}" />
-                            <DataGridTextColumn Header="Album"    Binding="{Binding Album}" />
-                            <DataGridTextColumn Header="Title"    Binding="{Binding Title}" />
-                            <DataGridTextColumn Header="year"     Binding="{Binding Year}" />
-                            <DataGridTextColumn Header="Artist"   Binding="{Binding Artist}" />
-                            <DataGridTextColumn Header="Duration" Binding="{Binding Duration}" />
-                            <DataGridTextColumn Header="Filename" Binding="{Binding Filename}" />
-                            <DataGridTextColumn Header="Filetype" Binding="{Binding Filetype}" />
-                            <DataGridTextColumn Header="Filepath" Binding="{Binding Filepath}" />
-                            <DataGridTextColumn Header="Position" Binding="{Binding Position}" />
-                        </DataGrid.Columns>
-
-                    </DataGrid>
+                    <ListView Margin="10" Name="lv_MediaLibraryView" SelectionMode="Multiple" MouseDoubleClick="lv_MediaLibraryView_OnMouseDoubleClick">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn DisplayMemberBinding="{Binding IsPlaying}">
+                                    <GridViewColumn.Header>
+                                        <GridViewColumnHeader Tag="isPlaying" Click="ButtonBase_OnClick">
+                                            IsPlaying
+                                        </GridViewColumnHeader>
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Album"    DisplayMemberBinding="{Binding Album}" />
+                                <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}" />
+                                <GridViewColumn Header="year"     DisplayMemberBinding="{Binding Year}" />
+                                <GridViewColumn Header="Artist"   DisplayMemberBinding="{Binding Artist}" />
+                                <GridViewColumn Header="Duration" DisplayMemberBinding="{Binding Duration}" />
+                                <GridViewColumn Header="Filename" DisplayMemberBinding="{Binding Filename}" />
+                                <GridViewColumn Header="Filetype" DisplayMemberBinding="{Binding Filetype}" />
+                                <GridViewColumn Header="Filepath" DisplayMemberBinding="{Binding Filepath}" />
+                                <GridViewColumn Header="Position" DisplayMemberBinding="{Binding Position}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
 
                 </Grid>
             </TabItem>

@@ -84,7 +84,7 @@ namespace MediaPlayer
             addToLibrary(fileLocation,fileName,title,duration,Artist, Album, fileType, 0);
         }
 
-        public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album, string fileType, int Position)
+        public void addToLibrary(String fileLocation, String fileName, String title, int duration, String Artist, String Album, string fileType, double Position)
         {
 
             sqlCommand.CommandText = "INSERT INTO library (FileName, Path, FileType, Title, duration, Artist, Album, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";

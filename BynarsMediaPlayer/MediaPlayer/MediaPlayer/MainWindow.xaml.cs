@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ListView = System.Windows.Controls.ListView;
 
 namespace MediaPlayer
 {
@@ -76,12 +77,7 @@ namespace MediaPlayer
                             + "position of the media, and the volume of playback.");
         }
 
-        private void DataGrid_MediaL_OnSelected(object sender, RoutedEventArgs e)
-        {
-            IList items = this.dataGrid_MediaL.SelectedItems;
-            this.Dispatcher.Invoke(new Action(() => _mainController.DataGridRowSelected(items)), new object[] { });
-        }
-
+        
         private void poly_SkipBackward_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] { });
@@ -106,5 +102,26 @@ namespace MediaPlayer
         {
             Dispatcher.Invoke(new Action(() => _mainController.MediaEnded()), new object[] { });
         }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine(e);
+        }
+
+        private void lv_MediaLibraryView_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            while (obj != null && obj != lv_MediaLibraryView)
+            {
+                if (obj.GetType() == typeof(ListViewItem))
+                {
+                    Dispatcher.Invoke(new Action(() => _mainController.PlaylistItemDoubleClicked((ListViewItem)obj)), new object[] { });
+                    break;
+                }
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+        }
     }
-}
+    }
+
