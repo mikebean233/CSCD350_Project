@@ -126,14 +126,14 @@
         <!-- Media -->
         <MediaElement Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill" MediaEnded="Me_MediaElement_OnMediaEnded"/>
 
-        <Label x:Name="lbl_MetaData" HorizontalAlignment="Left" Margin="305,479,0,0" VerticalAlignment="Top" Height="51" Width="321" Foreground="#FFFDFDFD"/>
+        <Label x:Name="lbl_MetaData" Content="Metadata" HorizontalAlignment="Left" Margin="305,479,0,0" VerticalAlignment="Top" Height="51" Width="321" Foreground="#FFFDFDFD"/>
 
         <!-- Library -->
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="361">
             <TabItem Header="Playlist 1">
                 <Grid Background="#FFE5E5E5" Margin="0,0,-6,0">
 
-
+                    
                 </Grid>
             </TabItem>
             <TabItem Header="Media Library" >
@@ -165,12 +165,8 @@
             </TabItem>
 
         </TabControl>
-        <Button x:Name="BTN_help" Style="{StaticResource ResourceKey=mediaButton}" Content="?" HorizontalAlignment="Center" Margin="674,479,601,0" VerticalAlignment="Top" Width="20" Height="20" Click="HelpBox" Foreground="#FFFBFBFB"/>
-        <Button x:Name="BTN_playMode" Style="{StaticResource ResourceKey=mediaButton}" Content="C" Margin="674,0,601,12.5" Width="Auto" Background="#FFE6E1E1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="toggleShuffle" Height="22">
-            <Button.Effect>
-                <DropShadowEffect/>
-            </Button.Effect>
-        </Button>
+        <Button x:Name="BTN_help" Style="{StaticResource ResourceKey=mediaButton}" Content="?" HorizontalAlignment="Center" Margin="676,479,602,0" VerticalAlignment="Top" Width="20" Height="20" Click="HelpBox" Foreground="#FFFBFBFB"/>
+
 
         <!-- Controls -->
         <Polygon Name="poly_PlayButton" Fill="#323D98" Stroke="Black" Margin="37,479,879,10" MouseDown="poly_PlayButton_MouseDown">
@@ -237,7 +233,6 @@
 
         <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="67,480,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
 
-
         <Slider Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" ValueChanged="slider_ScrubBar_ValueChanged"/>
 
         <Slider x:Name="slider_VolumeControl" Width="200" Value="0" Orientation="Horizontal" HorizontalAlignment="Left" 
@@ -247,5 +242,5 @@
             IsMoveToPointEnabled="False" Margin="701,480,0,39"
             ValueChanged="slider_VolumeControl_ValueChanged"
             Style="{StaticResource Horizontal_Slider}" />
-    </Grid>
+   </Grid>
 </Window>
