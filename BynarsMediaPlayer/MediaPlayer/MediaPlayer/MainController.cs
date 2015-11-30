@@ -195,8 +195,10 @@ namespace MediaPlayer
                     return false;
                 _currentItem = _mediaLibrary.GetCurrentMedia();
                 _mediaElement.Source = new Uri(_currentItem.Filepath);
-                if(_mediaElement.NaturalDuration.HasTimeSpan)
-                    _mediaElement.Position = new TimeSpan(0,0,0,0,(int)(_currentItem.Position * _mediaElement.NaturalDuration.TimeSpan.TotalMilliseconds));
+                _mediaElement.Play();
+                _mediaElement.Pause();
+                if (_mediaElement.NaturalDuration.HasTimeSpan)
+                    _mediaElement.Position = Utilities.BuildTimspanFromPerportion(_currentItem.Position, _mediaElement.NaturalDuration.TimeSpan);
                 if (_playState == PlayStateEnum.Playing)
                     _mediaElement.Play();
             }
@@ -214,16 +216,16 @@ namespace MediaPlayer
 
         public void MediaEnded()
         {
-            _currentItem = _mediaLibrary.GetNextSong();
-
             if (_currentItem != null)
-                _mediaElement.Source = new Uri(_currentItem.Filepath);    
+                _currentItem.Position = 0.0;
+
+            ChangeCurrentMedia(_mediaLibrary.GetNextSong());
         }
 
         public void SkipForwardButtonPressed()
         {
             Console.WriteLine("Skip Forward");
-            MediaEnded();
+            ChangeCurrentMedia(_mediaLibrary.GetNextSong());
         }
 
         public void SkipBackwardButtonPressed()
@@ -257,23 +259,19 @@ namespace MediaPlayer
             _playState = PlayStateEnum.Paused;
         }
 
+        
+
         public void ProgressBarMovedByUser(double newValue)
         {
             if (!_timerIsChangingScrubBar && _mediaElement.NaturalDuration.HasTimeSpan)
             {
                 _mediaElementPollingTimer.Enabled = false;
 
-                //    Console.WriteLine("ProgressBar Value: " + newValue);
-                TimeSpan totalTime = _mediaElement.NaturalDuration.TimeSpan;
-                int milliseconds   = (int)(totalTime.TotalMilliseconds * newValue) % 1000;
-                int seconds        = (int)(totalTime.TotalSeconds      * newValue) % 60;
-                int minutes        = (int)(totalTime.TotalMinutes      * newValue) % 60;
-                int hours          = (int)(totalTime.TotalHours        * newValue) % 24;
-                int days           = 0;
-                _mediaElement.Position = new TimeSpan(days, hours, minutes, seconds, milliseconds ); //_mediaElement.NaturalDuration.*newValue);
+
+                _mediaElement.Position = Utilities.BuildTimspanFromPerportion(newValue, _mediaElement.NaturalDuration.TimeSpan);
                 
                 TimeSpan timeElapsed = _mediaElement.Position;
-                _view.lbl_ScrubBarTime.Content = Utilities.BuildStringFromTimeSpan(timeElapsed) + "/" + Utilities.BuildStringFromTimeSpan(totalTime);
+                _view.lbl_ScrubBarTime.Content = Utilities.BuildStringFromTimeSpan(timeElapsed) + "/" + Utilities.BuildStringFromTimeSpan(_mediaElement.NaturalDuration.TimeSpan);
                 _mediaElementPollingTimer.Enabled = true;
             }
         }
