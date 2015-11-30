@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -20,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ListView = System.Windows.Controls.ListView;
 
 namespace MediaPlayer
 {
@@ -41,6 +43,7 @@ namespace MediaPlayer
             this.Dispatcher.Invoke(new Action(() => _mainController.PlayButtonPressed()), new object[] { });
         }
 
+        
         private void poly_StopButton_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.StopButtonPressed()), new object[] { });
@@ -74,12 +77,7 @@ namespace MediaPlayer
                             + "position of the media, and the volume of playback.");
         }
 
-        private void DataGrid_MediaL_OnSelected(object sender, RoutedEventArgs e)
-        {
-            IList items = this.dataGrid_MediaL.SelectedItems;
-            this.Dispatcher.Invoke(new Action(() => _mainController.DataGridRowSelected(items)), new object[] { });
-        }
-
+        
         private void poly_SkipBackward_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] { });
@@ -90,14 +88,40 @@ namespace MediaPlayer
             this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] { });
         }
 
-        private void Slider_ScrubBar_OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            this.Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
-        }
-
         private void Poly_PauseButton_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
             Dispatcher.Invoke(new Action(() => _mainController.PauseButtonPressed()), new object[] { });
         }
+
+        private void slider_ScrubBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
+        }
+
+        private void Me_MediaElement_OnMediaEnded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.MediaEnded()), new object[] { });
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine(e);
+        }
+
+        private void lv_MediaLibraryView_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            while (obj != null && obj != lv_MediaLibraryView)
+            {
+                if (obj.GetType() == typeof(ListViewItem))
+                {
+                    Dispatcher.Invoke(new Action(() => _mainController.PlaylistItemDoubleClicked((ListViewItem)obj)), new object[] { });
+                    break;
+                }
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+        }
     }
-}
+    }
+

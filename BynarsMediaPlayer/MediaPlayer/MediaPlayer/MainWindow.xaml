@@ -33,19 +33,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <Style x:Key="SliderThumb" TargetType="Thumb">
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <Setter Property="OverridesDefaultStyle" Value="true" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-                        <Ellipse Height="10" Width="10" Fill="#FF0074AD"></Ellipse>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <ControlTemplate x:Key="Slider"  TargetType="Slider">
             <Grid>
                 <Grid.RowDefinitions>
@@ -67,7 +54,31 @@
             </Grid>
         </ControlTemplate>
 
+        <Style x:Key="crub" TargetType="Slider">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="MinHeight" Value="21" />
+                    <Setter Property="MinWidth" Value="104" />
+                    <Setter Property="Template" Value="{StaticResource Slider}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="Horizontal_Slider" TargetType="Slider">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="MinHeight" Value="21" />
+                    <Setter Property="MinWidth" Value="104" />
+                    <Setter Property="Template" Value="{StaticResource Slider}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="Scrubbar_slider" TargetType="Slider">
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="SnapsToDevicePixels" Value="true" />
             <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -113,39 +124,42 @@
         </Canvas> -->
 
         <!-- Media -->
-        <MediaElement Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill"/>
+        <MediaElement Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill" MediaEnded="Me_MediaElement_OnMediaEnded"/>
 
         <Label x:Name="lbl_MetaData" Content="Metadata" HorizontalAlignment="Left" Margin="305,479,0,0" VerticalAlignment="Top" Height="51" Width="321" Foreground="#FFFDFDFD"/>
 
         <!-- Library -->
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="361">
             <TabItem Header="Playlist 1">
-                <Grid Background="#FFE5E5E5" Margin="0,0,-6,0"/>
+                <Grid Background="#FFE5E5E5" Margin="0,0,-6,0">
+
+                    
+                </Grid>
             </TabItem>
             <TabItem Header="Media Library" >
-                <Grid Background="#FFE5E5E5" Margin="0,0,11,-3">
-                    <DataGrid 
-                        x:Name="dataGrid_MediaL" 
-                        HorizontalAlignment="Left" 
-                        VerticalAlignment="Top" 
-                        Height="394" 
-                        Width="344" 
-                        SelectionChanged="DataGrid_MediaL_OnSelected"
-                        >
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Playing"  Binding="{Binding IsPlaying}" />
-                            <DataGridTextColumn Header="Album"    Binding="{Binding Album}" />
-                            <DataGridTextColumn Header="Title"    Binding="{Binding Title}" />
-                            <DataGridTextColumn Header="year"     Binding="{Binding Year}" />
-                            <DataGridTextColumn Header="Artist"   Binding="{Binding Artist}" />
-                            <DataGridTextColumn Header="Duration" Binding="{Binding Duration}" />
-                            <DataGridTextColumn Header="Filename" Binding="{Binding Filename}" />
-                            <DataGridTextColumn Header="Filetype" Binding="{Binding Filetype}" />
-                            <DataGridTextColumn Header="Filepath" Binding="{Binding Filepath}" />
-                            <DataGridTextColumn Header="Position" Binding="{Binding Position}" />
-                        </DataGrid.Columns>
-
-                    </DataGrid>
+                <Grid Background="#FFE5E5E5" Margin="0,0,11,-3" MaxHeight="394" MaxWidth="344">
+                    <ListView Margin="10" Name="lv_MediaLibraryView" SelectionMode="Multiple" MouseDoubleClick="lv_MediaLibraryView_OnMouseDoubleClick">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn DisplayMemberBinding="{Binding IsPlaying}">
+                                    <GridViewColumn.Header>
+                                        <GridViewColumnHeader Tag="isPlaying" Click="ButtonBase_OnClick">
+                                            IsPlaying
+                                        </GridViewColumnHeader>
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Album"    DisplayMemberBinding="{Binding Album}" />
+                                <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}" />
+                                <GridViewColumn Header="year"     DisplayMemberBinding="{Binding Year}" />
+                                <GridViewColumn Header="Artist"   DisplayMemberBinding="{Binding Artist}" />
+                                <GridViewColumn Header="Duration" DisplayMemberBinding="{Binding Duration}" />
+                                <GridViewColumn Header="Filename" DisplayMemberBinding="{Binding Filename}" />
+                                <GridViewColumn Header="Filetype" DisplayMemberBinding="{Binding Filetype}" />
+                                <GridViewColumn Header="Filepath" DisplayMemberBinding="{Binding Filepath}" />
+                                <GridViewColumn Header="Position" DisplayMemberBinding="{Binding Position}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
 
                 </Grid>
             </TabItem>
@@ -219,7 +233,7 @@
 
         <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="67,480,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
 
-        <Slider Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" PreviewMouseUp="Slider_ScrubBar_OnPreviewMouseUp"/>
+        <Slider Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" ValueChanged="slider_ScrubBar_ValueChanged"/>
 
         <Slider x:Name="slider_VolumeControl" Width="200" Value="0" Orientation="Horizontal" HorizontalAlignment="Left" 
             IsSnapToTickEnabled="False" Minimum="0" Maximum="1" TickPlacement="BottomRight" 
