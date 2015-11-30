@@ -20,7 +20,7 @@ namespace MediaPlayer
         public string Artist { get; set; }
         // public string Id { get; set; }
         [DataMember]
-        public int Duration { get; set; }
+        public long Duration { get; set; }
         [DataMember]
         public string Filename { get; set; }
         [DataMember]
