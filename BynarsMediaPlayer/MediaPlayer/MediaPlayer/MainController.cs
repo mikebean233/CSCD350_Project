@@ -113,7 +113,7 @@ namespace MediaPlayer
             UpdateDataGrids();
 
             // Start the polling timer (which is used to update the view)
-            _mediaElementPollingTimer = new Timer(100);
+            _mediaElementPollingTimer = new Timer(150);
             _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
             _mediaElementPollingTimer.Start();
         }
@@ -255,6 +255,25 @@ namespace MediaPlayer
             //Console.WriteLine("Pause");
             _mediaElement.Pause();
             _playState = PlayStateEnum.Paused;
+        }
+
+        public void ShuffleToggled()
+        {
+            if (_playMode == PlayModeEnum.Consecutive)
+            {
+                _playMode = PlayModeEnum.Shuffle;
+                _view.BTN_playMode.Content = "S";
+            }else
+            if (_playMode == PlayModeEnum.Shuffle)
+            {
+                _playMode = PlayModeEnum.Repeat;
+                _view.BTN_playMode.Content = "R";
+            }
+            else
+            {
+                _playMode = PlayModeEnum.Consecutive;
+                _view.BTN_playMode.Content = "C";
+            }
         }
 
         public void ProgressBarMovedByUser(double newValue)
