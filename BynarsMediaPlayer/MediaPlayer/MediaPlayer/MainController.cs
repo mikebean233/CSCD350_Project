@@ -257,26 +257,22 @@ namespace MediaPlayer
 
         public void VolumeSliderChanged(double newValue)
         {
-            //Console.WriteLine("Volume Value: " + newValue);
             _view.me_MediaElement.Volume = newValue;
             _volume = newValue;
         }
 
         public void PlayButtonPressed()
         {
-            //   Console.WriteLine("Play");
             _mediaElement.Play();
             _playState = PlayStateEnum.Playing;
         }
         public void StopButtonPressed()
         {
-            //Console.WriteLine("Stop");
             _mediaElement.Stop();
         }
 
         public void PauseButtonPressed()
         {
-            //Console.WriteLine("Pause");
             _mediaElement.Pause();
             _playState = PlayStateEnum.Paused;
         }
