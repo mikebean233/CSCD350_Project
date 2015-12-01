@@ -124,7 +124,7 @@
         </Canvas> -->
 
         <!-- Media -->
-        <MediaElement Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill" MediaEnded="Me_MediaElement_OnMediaEnded"/>
+        <MediaElement Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill" MediaEnded="Me_MediaElement_OnMediaEnded" ScrubbingEnabled="true"/>
 
         <Label x:Name="lbl_MetaData" Content="Metadata" HorizontalAlignment="Left" Margin="305,479,0,0" VerticalAlignment="Top" Height="51" Width="321" Foreground="#FFFDFDFD"/>
 

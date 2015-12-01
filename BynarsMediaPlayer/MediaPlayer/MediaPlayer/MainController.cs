@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Timers;
 using Timer = System.Timers.Timer;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
@@ -45,6 +46,8 @@ namespace MediaPlayer
         [DataMember]
         private string _currentPlaylistName;
 
+        // This variable is used to change the position of the media, it will be changed when the timer gets triggered
+        private double _requestedPositionValue;
         // private List<string> _selectedLibraryFiles;
          
         public List<string> SupportedExtentions { get { return _supportedExtentions; } } 
@@ -123,8 +126,17 @@ namespace MediaPlayer
             _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
         }
 
+        private void CheckForPositionChangeRequest()
+        {
+            if (_requestedPositionValue != 0.0 && _mediaElement.NaturalDuration.HasTimeSpan)
+            {
+                _mediaElement.Position = Utilities.BuildTimspanFromPerportion(_requestedPositionValue, _mediaElement.NaturalDuration.TimeSpan);
+                _requestedPositionValue = 0.0;
+            }
+        }
         public void PollingTimerHandler(object sender, ElapsedEventArgs e)
         {
+            _view.Dispatcher.Invoke(new Action(() => CheckForPositionChangeRequest()), new object[] { });
             if (_playState == PlayStateEnum.Playing)
             {
                 _timerIsChangingScrubBar = true;
@@ -206,10 +218,9 @@ namespace MediaPlayer
                     return false;
                 _currentItem = _mediaLibrary.GetCurrentMedia();
                 _mediaElement.Source = new Uri(_currentItem.Filepath);
-                _mediaElement.Play();
-                _mediaElement.Pause();
-                if (_mediaElement.NaturalDuration.HasTimeSpan)
-                    _mediaElement.Position = Utilities.BuildTimspanFromPerportion(_currentItem.Position, _mediaElement.NaturalDuration.TimeSpan);
+
+                _requestedPositionValue = _currentItem.Position;
+
                 if (_playState == PlayStateEnum.Playing)
                     _mediaElement.Play();
             }
@@ -274,17 +285,8 @@ namespace MediaPlayer
 
         public void ProgressBarMovedByUser(double newValue)
         {
-            if (!_timerIsChangingScrubBar && _mediaElement.NaturalDuration.HasTimeSpan)
-            {
-                _mediaElementPollingTimer.Enabled = false;
-
-
-                _mediaElement.Position = Utilities.BuildTimspanFromPerportion(newValue, _mediaElement.NaturalDuration.TimeSpan);
-                
-                TimeSpan timeElapsed = _mediaElement.Position;
-                _view.lbl_ScrubBarTime.Content = Utilities.BuildStringFromTimeSpan(timeElapsed) + "/" + Utilities.BuildStringFromTimeSpan(_mediaElement.NaturalDuration.TimeSpan);
-                _mediaElementPollingTimer.Enabled = true;
-            }
+            if (!_timerIsChangingScrubBar)
+                _requestedPositionValue = newValue;
         }
 
         public void CloseWindow()
