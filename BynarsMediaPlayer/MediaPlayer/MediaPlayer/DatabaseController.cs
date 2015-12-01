@@ -25,7 +25,7 @@ namespace MediaPlayer
 
                 sqlConnection = new SQLiteConnection("Data Source = media.DB;Version = 3");
                 sqlConnection.Open();
-                String sql = "CREATE TABLE IF NOT EXISTs library (FileName VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration VARCHAR, Artist VARCHAR, Album VARCHAR, Position VARCHAR) ";
+                String sql = "CREATE TABLE IF NOT EXISTs library (FileName VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration INTEGER, Artist VARCHAR, Album VARCHAR, Position REAL) ";
                 sqlCommand = new SQLiteCommand(sql, sqlConnection);
                 sqlCommand.ExecuteNonQuery();
         }
