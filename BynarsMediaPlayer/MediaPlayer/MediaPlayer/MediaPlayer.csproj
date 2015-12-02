@@ -123,6 +123,17 @@
   <ItemGroup>
     <Resource Include="Images\PlayButton.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ExpandMenuButton.png" />
+    <Resource Include="Images\FastForwardButton.png" />
+    <Resource Include="Images\PauseButton.png" />
+    <Resource Include="Images\RepeatButton.png" />
+    <Resource Include="Images\RewindButton.png" />
+    <Resource Include="Images\ShuffleButton.png" />
+    <Resource Include="Images\SkipBackwardButton.png" />
+    <Resource Include="Images\SkipForewardButton.png" />
+    <Resource Include="Images\StopButton.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
