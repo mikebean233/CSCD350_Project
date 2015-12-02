@@ -54,6 +54,12 @@ namespace MediaPlayer
 
                 try
                 {
+                    string titleReplacement = "";
+                    char[] splitCharactersForTitle = {'/', '\\', '.'};
+                    string[] splitByCharacters = mediaPath.Split(splitCharactersForTitle);
+                    titleReplacement = splitByCharacters[splitByCharacters.Length - 2];
+                    ID3Tags["title"] = titleReplacement;
+
                     string switchValue = extention.ToLower();
                     ID3Tags["filetype"] = switchValue;
                     if (switchValue == "asf") switchValue = "wmv";
