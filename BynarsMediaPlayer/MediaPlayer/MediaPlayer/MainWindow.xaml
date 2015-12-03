@@ -148,10 +148,10 @@
                                         </GridViewColumnHeader>
                                     </GridViewColumn.Header>
                                 </GridViewColumn>
-                                <GridViewColumn Header="Album"    DisplayMemberBinding="{Binding Album}" />
-                                <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}" />
-                                <GridViewColumn Header="year"     DisplayMemberBinding="{Binding Year}" />
-                                <GridViewColumn Header="Artist"   DisplayMemberBinding="{Binding Artist}" />
+                                <GridViewColumn Header="Album"    DisplayMemberBinding="{Binding Album}"    />
+                                <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}"    />
+                                <GridViewColumn Header="year"     DisplayMemberBinding="{Binding Year}"     />
+                                <GridViewColumn Header="Genre"    DisplayMemberBinding="{Binding Genre}"    />
                                 <GridViewColumn Header="Duration" DisplayMemberBinding="{Binding Duration}" />
                                 <GridViewColumn Header="Filename" DisplayMemberBinding="{Binding Filename}" />
                                 <GridViewColumn Header="Filetype" DisplayMemberBinding="{Binding Filetype}" />

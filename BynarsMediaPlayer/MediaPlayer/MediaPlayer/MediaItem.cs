@@ -20,6 +20,8 @@ namespace MediaPlayer
         public string Artist { get; set; }
         // public string Id { get; set; }
         [DataMember]
+        public string Genre { get; set; }
+        [DataMember]
         public long Duration { get; set; }
         [DataMember]
         public string Filename { get; set; }
@@ -40,6 +42,11 @@ namespace MediaPlayer
             IsPlaying = false;
             Position = 0.0;
             Duration = 0;
+            Album = "";
+            Title = "";
+            Artist = "";
+            Year = "";
+            Genre = "";
         }
 
         public MediaItem()
@@ -52,6 +59,7 @@ namespace MediaPlayer
             Title = "";
             Artist = "";
             Year = "";
+            Genre = "";
         }
 
         public override int GetHashCode()
