@@ -13,6 +13,7 @@ namespace MediaPlayer
     {
         private string _name;
         private HashSet<MediaItem> _library;
+        private LinkedList<MediaItem> _reverseLibrary; 
         private MainController _mainController;
         private MediaItem _currentItem;
         private IEnumerator<MediaItem> _itemPointer; 
@@ -23,6 +24,7 @@ namespace MediaPlayer
             _mainController = mainController;
             _library = new HashSet<MediaItem>();
             _itemPointer = _library.GetEnumerator();
+            _reverseLibrary = new LinkedList<MediaItem>();
         }
 
         public string Name
@@ -32,8 +34,9 @@ namespace MediaPlayer
 
         public int AddNewMediaItem(MediaItem item)
         {
-            if (item != null)
+            if (item != null && !_library.Contains(item))
             {
+                _reverseLibrary.AddFirst(item);
                 _library.Add(item);
             }
             if (_library.Count == 1)
@@ -62,6 +65,7 @@ namespace MediaPlayer
             }
             if (_currentItem.Equals(item))
                 GetNextSong();
+            _reverseLibrary.Remove(item);
             _library.Remove(item);
 
            ResetItemPointerToCurrent();
@@ -91,7 +95,13 @@ namespace MediaPlayer
                 _currentItem = items.ToList()[0];
 
             foreach (MediaItem thisItem in items)
-                _library.Add(thisItem);
+            {
+                if (!_library.Contains(thisItem))
+                {
+                    _reverseLibrary.AddFirst(thisItem);
+                    _library.Add(thisItem);
+                }
+            }
             ResetItemPointerToCurrent();
 
             return _library.Count;
@@ -120,6 +130,36 @@ namespace MediaPlayer
             _currentItem = _itemPointer.Current;
             _currentItem.IsPlaying = true;
             return true;
+        }
+
+        public MediaItem GetPreviousSong()
+        {
+            if (_currentItem != null)
+                _currentItem.IsPlaying = false;
+
+            if (_reverseLibrary.Any())
+            {
+                if (_currentItem == null)
+                {
+                    _currentItem = _reverseLibrary.First.Value;
+                }
+                else if (_reverseLibrary.Last.Value.Equals(_currentItem))
+                {
+                    _currentItem = _reverseLibrary.First.Value;
+                }
+                else
+                {
+                    LinkedListNode<MediaItem> thisNode = _reverseLibrary.Find(_currentItem);
+                    _currentItem = thisNode.Next.Value;
+                }
+            }
+            else
+            {// Using a null object, this should never be necessary...
+                _currentItem = new MediaItem();
+            }
+            _currentItem.IsPlaying = true;
+            ResetItemPointerToCurrent();
+            return _currentItem;
         }
         public MediaItem GetNextSong()
         {
@@ -153,6 +193,7 @@ namespace MediaPlayer
             }
             if(_currentItem != null)
                 _currentItem.IsPlaying = true;
+
             return _currentItem;
         }
 
