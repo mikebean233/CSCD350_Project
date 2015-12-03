@@ -42,6 +42,18 @@ namespace MediaPlayer
             Duration = 0;
         }
 
+        public MediaItem()
+        {
+            Filepath = "";
+            IsPlaying = false;
+            Position = 0.0;
+            Duration = 0;
+            Album = "";
+            Title = "";
+            Artist = "";
+            Year = "";
+        }
+
         public override int GetHashCode()
         {
             if (String.IsNullOrEmpty(Filepath))

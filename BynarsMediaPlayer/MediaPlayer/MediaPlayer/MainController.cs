@@ -252,7 +252,7 @@ namespace MediaPlayer
 
         public void SkipBackwardButtonPressed()
         {
-            Console.WriteLine("Skip Backward");
+            ChangeCurrentMedia(_mediaLibrary.GetPreviousSong());
         }
 
         public void VolumeSliderChanged(double newValue)
