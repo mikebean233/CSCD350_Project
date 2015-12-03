@@ -31,6 +31,7 @@ namespace MediaPlayer
                 _knownTags.Add("TLEN","duration");
                 _knownTags.Add("TOFN","filename");
                 _knownTags.Add("TFLT", "filetype");
+                _knownTags.Add("TCON", "genre");
             }
             _initialized = true;
         }

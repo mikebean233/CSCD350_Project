@@ -34,14 +34,13 @@ namespace MediaPlayer
             thisItem.Album = tags["album"];
             thisItem.Title = tags["title"];
             thisItem.Year = tags["year"];
-            //thisItem.Id = tags["id"];
             thisItem.Artist = tags["artist"];
             thisItem.Duration = 0;
             try { thisItem.Duration = Int32.Parse(tags["duration"]);}catch(Exception e) { }
             thisItem.Filename = tags["filename"];
             thisItem.Filetype = tags["filetype"];
             thisItem.Position = 0;
-
+            thisItem.Genre = tags["genre"];
             return thisItem;
         }
 
