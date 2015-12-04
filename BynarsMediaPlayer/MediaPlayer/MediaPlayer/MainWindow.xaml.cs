@@ -31,6 +31,7 @@ namespace MediaPlayer
     public partial class MainWindow : Window
     {
         private MainController _mainController;
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -38,23 +39,89 @@ namespace MediaPlayer
             _mainController = new MainController(this);
         }
 
-        private void poly_PlayButton_MouseDown(object sender, MouseButtonEventArgs e)
+    /******************************  MAIN BUTTON EVENTS  ******************************/
+      //Play
+        private void btn_PlayButton_Click(object sender, RoutedEventArgs e)
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.PlayButtonPressed()), new object[] { });
         }
 
-        
-        private void poly_StopButton_MouseDown(object sender, MouseButtonEventArgs e)
+      //Rewind
+        private void btn_RewindButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.RewindButtonPressed()), new object[] { });
+        }
+
+      //SkipBackwards
+        private void btn_SkipBackwardButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] { });
+        }
+
+      //Stop
+        private void btn_StopButton_Click(object sender, RoutedEventArgs e)
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.StopButtonPressed()), new object[] { });
         }
 
-        
+      //SkipForward
+        private void btn_SkipForwardButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] { });
+        }
+
+      //FastForward
+        private void btn_FastForwardButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() => _mainController.FastForwardButtonPressed()), new object[] { });
+        }
+
+      //Shuffle
+        private void toggleShuffle(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.ShuffleToggled()), new object[] { });
+        }
+
+      //Repeat
+        private void toggleRepeat(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.RepeatToggled()), new object[] { });
+        }
+
+      //ScrubBar
+        private void slider_ScrubBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
+        }
+
+      //Volume
         private void slider_VolumeControl_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.VolumeSliderChanged(this.slider_VolumeControl.Value)), new object[] { });
         }
 
+      //Hover Buttons
+        private void btnBehavior_MouseEnter(object sender, MouseEventArgs e)
+        {
+            FrameworkElement element = (FrameworkElement)sender;
+            element.Opacity = 0.75;
+        }
+
+        private void btnBehavior_MouseLeave(object sender, MouseEventArgs e)
+        {
+            FrameworkElement element = (FrameworkElement)sender;
+            element.Opacity = 0.25;
+        }
+        
+        private void btnBehavior_MouseDown(object sender, MouseEventArgs e)
+        {
+            FrameworkElement element = (FrameworkElement) sender;
+            element.Opacity = 1.0;
+        }
+
+
+
+    /******************************  WINDOW EVENTS  ******************************/
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             (new Thread(new ThreadStart(_mainController.Setup))).Start();
@@ -65,6 +132,65 @@ namespace MediaPlayer
             this.Dispatcher.Invoke(new Action(() => _mainController.CloseWindow()), new object[] { });
         }
 
+
+    /******************************  MEDIA EVENTS  ******************************/
+        private void Me_MediaElement_OnMediaEnded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.MediaEnded()), new object[] { });
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine(e);
+        }
+
+
+
+        private void RowImage_OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            ListViewItem selectedItem = null;
+            while (obj != null && obj != lv_MediaLibraryView)
+            {
+                if (obj.GetType() == typeof(ListViewItem))
+                    Dispatcher.Invoke(new Action(() => _mainController.PlayListItemMouseLeave((Image)sender, ((ListViewItem)obj).DataContext)), new object[] { });
+
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+        }
+
+        private void RowImage_OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            Image sourceImage = null;
+            ListViewItem selectedItem = null;
+            while (obj != null && obj != lv_MediaLibraryView)
+            {
+
+                if (obj.GetType() == typeof(ListViewItem))
+                    Dispatcher.Invoke(new Action(() => _mainController.PlayListItemMouseEnter((Image)sender, ((ListViewItem)obj).DataContext)), new object[] { });
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+        }
+
+        private void RowImage_OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            while (obj != null && obj != lv_MediaLibraryView)
+            {
+                if (obj.GetType() == typeof(ListViewItem))
+                {
+                    Dispatcher.Invoke(new Action(() => _mainController.PlaylistItemClicked(((ListViewItem)obj).DataContext)), new object[] { });
+                    break;
+                }
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+        }
+
+        /******************************  INFORMATION EVENTS  ******************************/
         private void HelpBox(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Bynars Media Player" + Environment.NewLine
@@ -76,57 +202,6 @@ namespace MediaPlayer
                             + "go to the previous media.  There is also two sliders to control the" + Environment.NewLine
                             + "position of the media, and the volume of playback.");
         }
-
-        
-        private void poly_SkipBackward_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] { });
-        }
-
-        private void poly_SkipForeward_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] { });
-        }
-
-        private void Poly_PauseButton_OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Dispatcher.Invoke(new Action(() => _mainController.PauseButtonPressed()), new object[] { });
-        }
-
-        private void slider_ScrubBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
-        }
-
-        private void Me_MediaElement_OnMediaEnded(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.Invoke(new Action(() => _mainController.MediaEnded()), new object[] { });
-        }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            Console.WriteLine(e);
-        }
-
-        private void lv_MediaLibraryView_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            DependencyObject obj = (DependencyObject)e.OriginalSource;
-
-            while (obj != null && obj != lv_MediaLibraryView)
-            {
-                if (obj.GetType() == typeof(ListViewItem))
-                {
-                    Dispatcher.Invoke(new Action(() => _mainController.PlaylistItemDoubleClicked((ListViewItem)obj)), new object[] { });
-                    break;
-                }
-                obj = VisualTreeHelper.GetParent(obj);
-            }
-        }
-
-        private void toggleShuffle(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.Invoke(new Action(() => _mainController.ShuffleToggled()), new object[] { });
-        }
     }
-    }
+}
 

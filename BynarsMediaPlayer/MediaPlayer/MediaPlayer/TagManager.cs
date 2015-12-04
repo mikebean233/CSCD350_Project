@@ -31,6 +31,7 @@ namespace MediaPlayer
                 _knownTags.Add("TLEN","duration");
                 _knownTags.Add("TOFN","filename");
                 _knownTags.Add("TFLT", "filetype");
+                _knownTags.Add("TCON", "genre");
             }
             _initialized = true;
         }
@@ -54,6 +55,12 @@ namespace MediaPlayer
 
                 try
                 {
+                    string titleReplacement = "";
+                    char[] splitCharactersForTitle = {'/', '\\', '.'};
+                    string[] splitByCharacters = mediaPath.Split(splitCharactersForTitle);
+                    titleReplacement = splitByCharacters[splitByCharacters.Length - 2];
+                    ID3Tags["title"] = titleReplacement;
+
                     string switchValue = extention.ToLower();
                     ID3Tags["filetype"] = switchValue;
                     if (switchValue == "asf") switchValue = "wmv";

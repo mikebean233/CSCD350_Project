@@ -120,6 +120,33 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PlayButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ExpandMenuButton.png" />
+    <Resource Include="Images\FastForwardButton.png" />
+    <Resource Include="Images\PauseButton.png" />
+    <Resource Include="Images\RepeatButton.png" />
+    <Resource Include="Images\RewindButton.png" />
+    <Resource Include="Images\ShuffleButton.png" />
+    <Resource Include="Images\SkipBackwardButton.png" />
+    <Resource Include="Images\StopButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\SkipForwardButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PlayFromList.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\PlayFromListActive.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\PlayFromListInActive.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -8,6 +8,7 @@
 
     <Window.Resources>
 
+        <!-- Custom Slider -->
         <Style x:Key="SliderRepeatButton" TargetType="RepeatButton">
             <Setter Property="SnapsToDevicePixels" Value="true" />
             <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -16,7 +17,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RepeatButton">
-                        <Border BorderThickness="3" BorderBrush="#565460" Background="#565460" Height="3"/>
+                        <Border BorderThickness="1" BorderBrush="#565460" Background="#565460" Height="3"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -28,7 +29,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RepeatButton">
-                        <Border SnapsToDevicePixels="True" Background="#B8D541" BorderThickness="3" BorderBrush="#000013" Height="3"/>
+                        <Border SnapsToDevicePixels="True" Background="#B8D541" BorderThickness="1" BorderBrush="#565460" Height="3"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -42,13 +43,13 @@
                 </Grid.RowDefinitions>
                 <Track Grid.Row="1" x:Name="PART_Track"   >
                     <Track.DecreaseRepeatButton>
-                        <RepeatButton Style="{StaticResource SliderRepeatButton1}"  Command="Slider.DecreaseLarge" />
+                        <RepeatButton Style="{StaticResource SliderRepeatButton1}"/>
                     </Track.DecreaseRepeatButton>
                     <Track.Thumb>
                         <Thumb Style="{StaticResource SliderThumb}"  />
                     </Track.Thumb>
                     <Track.IncreaseRepeatButton>
-                        <RepeatButton Style="{StaticResource SliderRepeatButton}" Command="Slider.IncreaseLarge" />
+                        <RepeatButton Style="{StaticResource SliderRepeatButton}"/>
                     </Track.IncreaseRepeatButton>
                 </Track>
             </Grid>
@@ -92,7 +93,14 @@
         </Style>
     </Window.Resources>
 
-    <Grid Background= "#000013" Margin="0,0,5,0.5">
+    <Grid x:Name="mainScreen" Margin="0,0,5,0.5">
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FF000013" Offset="0.2"/>
+                <GradientStop Color="#FF000013" Offset="0.8"/>
+                <GradientStop Color="#FF3E3D50" Offset="0.5"/>
+            </LinearGradientBrush>
+        </Grid.Background>
         <!-- Background -->
         <Border BorderThickness="1" BorderBrush="#FF0074AD" CornerRadius="10" Padding="2"
         HorizontalAlignment="Left" Margin="27,23,0,90">
@@ -119,14 +127,10 @@
 
         </Border>
 
-        <!-- Media 
-        <Canvas x:Name="canvas_media" Background="#868596" Margin="25,25,25,75">   
-        </Canvas> -->
-
         <!-- Media -->
-        <MediaElement Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill" MediaEnded="Me_MediaElement_OnMediaEnded"/>
+        <MediaElement x:Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill" MediaEnded="Me_MediaElement_OnMediaEnded" ScrubbingEnabled="true"/>
 
-        <Label x:Name="lbl_MetaData" HorizontalAlignment="Left" Margin="305,479,0,0" VerticalAlignment="Top" Height="51" Width="321" Foreground="#FFFDFDFD"/>
+        <Label x:Name="lbl_MetaData" Content="Metadata" HorizontalAlignment="Left" Margin="427,479,0,0" VerticalAlignment="Top" Height="51" Width="242" Foreground="#FFFDFDFD"/>
 
         <!-- Library -->
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="361">
@@ -138,25 +142,44 @@
             </TabItem>
             <TabItem Header="Media Library" >
                 <Grid Background="#FFE5E5E5" Margin="0,0,11,-3" MaxHeight="394" MaxWidth="344">
-                    <ListView Margin="10" Name="lv_MediaLibraryView" SelectionMode="Multiple" MouseDoubleClick="lv_MediaLibraryView_OnMouseDoubleClick">
+                    <ListView Margin="10" Name="lv_MediaLibraryView" SelectionMode="Multiple">
+                        <ListView.Resources>
+
+                        </ListView.Resources>
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn DisplayMemberBinding="{Binding IsPlaying}">
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image x:Name="RowImage" Height="25" Width="25" MouseEnter="RowImage_OnMouseEnter" MouseUp="RowImage_OnMouseUp" MouseLeave="RowImage_OnMouseLeave">
+                                                <Image.Style>
+                                                    <Style>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsPlaying}" Value="true">
+                                                                <Setter Property="Image.Source" Value="Images/PlayFromListActive.png"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsPlaying}" Value="false">
+                                                                <Setter Property="Image.Source" Value="Images/PlayFromListInActive.png"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Image.Style>
+                                            </Image>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+
+
                                     <GridViewColumn.Header>
                                         <GridViewColumnHeader Tag="isPlaying" Click="ButtonBase_OnClick">
                                             IsPlaying
                                         </GridViewColumnHeader>
                                     </GridViewColumn.Header>
                                 </GridViewColumn>
-                                <GridViewColumn Header="Album"    DisplayMemberBinding="{Binding Album}" />
-                                <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}" />
-                                <GridViewColumn Header="year"     DisplayMemberBinding="{Binding Year}" />
-                                <GridViewColumn Header="Artist"   DisplayMemberBinding="{Binding Artist}" />
-                                <GridViewColumn Header="Duration" DisplayMemberBinding="{Binding Duration}" />
-                                <GridViewColumn Header="Filename" DisplayMemberBinding="{Binding Filename}" />
-                                <GridViewColumn Header="Filetype" DisplayMemberBinding="{Binding Filetype}" />
+                                <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}"  />
+                                <GridViewColumn Header="Artist"   DisplayMemberBinding="{Binding Artist}"    />
+                                <GridViewColumn Header="Genre"    DisplayMemberBinding="{Binding Genre}"    />
+                                <GridViewColumn Header="year"     DisplayMemberBinding="{Binding Year}"     />
                                 <GridViewColumn Header="Filepath" DisplayMemberBinding="{Binding Filepath}" />
-                                <GridViewColumn Header="Position" DisplayMemberBinding="{Binding Position}" />
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -165,7 +188,7 @@
             </TabItem>
 
         </TabControl>
-        <Button x:Name="BTN_help" Style="{StaticResource ResourceKey=mediaButton}" Content="?" HorizontalAlignment="Center" Margin="674,479,601,0" VerticalAlignment="Top" Width="20" Height="20" Click="HelpBox" Foreground="#FFFBFBFB"/>
+        <Button x:Name="BTN_help" Style="{StaticResource ResourceKey=mediaButton}" Content="?" HorizontalAlignment="Center" Margin="676,479,602,0" VerticalAlignment="Top" Width="20" Height="20" Click="HelpBox" Foreground="#FFFBFBFB"/>
         <Button x:Name="BTN_playMode" Style="{StaticResource ResourceKey=mediaButton}" Content="C" Margin="674,0,601,12.5" Width="Auto" Background="#FFE6E1E1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="toggleShuffle" Height="22">
             <Button.Effect>
                 <DropShadowEffect/>
@@ -173,23 +196,87 @@
         </Button>
 
         <!-- Controls -->
-        <Polygon Name="poly_PlayButton" Fill="#323D98" Stroke="Black" Margin="37,479,879,10" MouseDown="poly_PlayButton_MouseDown">
-            <Polygon.Points>
-                <Point X="0" Y="0"></Point>
-                <Point X="20" Y="15"></Point>
-                <Point X="0" Y="30"></Point>
-            </Polygon.Points>
-        </Polygon>
+        <Image x:Name="btn_PauseButton" 
+                Margin="37,479,1194,13.5" 
+                Opacity=".5"
+                MouseEnter="btnBehavior_MouseEnter"
+                MouseLeave="btnBehavior_MouseLeave"
+                MouseUp="btn_PlayButton_Click"
+                Visibility="Hidden" 
+                Source="./Images/PauseButton.png" />            
 
-        <Polygon Name="poly_StopButton" Fill="#323D98" Stroke="Black" Margin="199,479,712,10" MouseDown="poly_StopButton_MouseDown">
-            <Polygon.Points>
-                <Point X="5" Y="5"></Point>
-                <Point X="25" Y="5"></Point>
-                <Point X="25" Y="25"></Point>
-                <Point X="5" Y="25"></Point>
-            </Polygon.Points>
-        </Polygon>
-        <Polygon Name="Poly_PauseButton" Fill="#323D98" Stroke="Black" Margin="260,480,998,25" MouseDown="Poly_PauseButton_OnMouseDown">
+        <Image x:Name="btn_PlayButton" 
+                Margin="37,479,1194,13.5" 
+                Opacity=".5"
+                MouseEnter="btnBehavior_MouseEnter"
+                MouseLeave="btnBehavior_MouseLeave"
+                MouseUp="btn_PlayButton_Click"
+                MouseDown="btnBehavior_MouseDown"
+                Visibility="Visible"
+                Source="./Images/PlayButton.png"/>
+
+            <Image x:Name="btn_StopButton" 
+                Margin="310,489,949,22.5" 
+
+                Opacity=".5"
+                MouseEnter="btnBehavior_MouseEnter"
+                MouseLeave="btnBehavior_MouseLeave"
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_StopButton_Click"
+                Source="./Images/StopButton.png" />
+
+        <Image x:Name="btn_SkipForwardButton" 
+                Margin="348,489,911,22.5" 
+                Opacity=".5"
+                MouseEnter="btnBehavior_MouseEnter"
+                MouseLeave="btnBehavior_MouseLeave"
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_SkipForwardButton_Click"
+                Source="./Images/SkipForwardButton.png" />
+
+        <Image x:Name="btn_SkipBackwardButton" 
+                Margin="272,489,987,22.5" 
+                Opacity=".5"
+                MouseEnter="btnBehavior_MouseEnter"
+                MouseLeave="btnBehavior_MouseLeave"
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_SkipBackwardButton_Click"
+                Source="./Images/SkipBackwardButton.png"/>
+
+            <Image x:Name="btn_FastForwardButton" 
+                Margin="386,489,873,22.5"
+                Opacity=".5"
+                MouseEnter="btnBehavior_MouseEnter"
+                MouseLeave="btnBehavior_MouseLeave"
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_FastForwardButton_Click"
+                Source="./Images/FastForwardButton.png" />
+
+        <Image x:Name="btn_RewindButton" 
+                Margin="234,489,1025,22.5" 
+                Opacity=".5"
+                MouseEnter="btnBehavior_MouseEnter"
+                MouseLeave="btnBehavior_MouseLeave"
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_RewindButton_Click"
+                Source="./Images/RewindButton.png"/>
+
+            <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="116,487.5,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
+
+        <Slider x:Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" ValueChanged="slider_ScrubBar_ValueChanged"/>
+
+        <Slider x:Name="slider_VolumeControl" Width="200" Value="0" Orientation="Horizontal" HorizontalAlignment="Left" 
+            IsSnapToTickEnabled="False" Minimum="0" Maximum="1" TickPlacement="BottomRight" 
+            AutoToolTipPlacement="BottomRight"
+            AutoToolTipPrecision="2" IsDirectionReversed="False"
+            IsMoveToPointEnabled="False" Margin="701,480,0,28.5"
+            ValueChanged="slider_VolumeControl_ValueChanged"
+            Style="{StaticResource Horizontal_Slider}" />
+    </Grid>
+</Window>
+
+<!--
+        <Polygon Name="Poly_PauseButton" Fill="#323D98" Stroke="Black" Margin="343,480,915,24.5" MouseDown="Poly_PauseButton_OnMouseDown">
             <Polygon.Points>
                 <Point X="5" Y="5"></Point>
                 <Point X="25" Y="5"></Point>
@@ -202,50 +289,57 @@
                 <Point X="5" Y="25"></Point>
             </Polygon.Points>
         </Polygon>
+        -->
 
-        <Polygon Name="poly_SkipForeward" Fill="#323D98" Stroke="Black" Margin="230,479,681,10" MouseDown="poly_SkipForeward_MouseDown">
+<!--
+        <Polygon Name="poly_PlayButton" Fill="#323D98" Stroke="Black" Margin="37,479,879,10" MouseDown="poly_PlayButton_MouseDown">
             <Polygon.Points>
-                <!-- Triangle -->
+                <Point X="0" Y="0"></Point>
+                <Point X="20" Y="15"></Point>
+                <Point X="0" Y="30"></Point>
+            </Polygon.Points>
+        </Polygon>
+        -->
+
+<!--
+        <Polygon Name="poly_StopButton" Fill="#323D98" Stroke="Black" Margin="282,479,629,9.5" MouseDown="poly_StopButton_MouseDown">
+            <Polygon.Points>
+                <Point X="5" Y="5"></Point>
+                <Point X="25" Y="5"></Point>
+                <Point X="25" Y="25"></Point>
+                <Point X="5" Y="25"></Point>
+            </Polygon.Points>
+        </Polygon>
+        -->
+
+<!--
+        <Polygon Name="poly_SkipForeward" Fill="#323D98" Stroke="Black" Margin="332,484,579,3.5" MouseDown="poly_SkipForeward_MouseDown">
+            <Polygon.Points>
+                Triangle
                 <Point X="5" Y="5"></Point>
                 <Point X="20" Y="15"></Point>
                 <Point X="5" Y="25"></Point>
-                <!-- Bar 
+                Bar 
                 <Point X="20" Y="5"></Point>
                 <Point X="25" Y="5"></Point>
                 <Point X="25" Y="25"></Point>
-                <Point X="20" Y="25"></Point> -->
+                <Point X="20" Y="25"></Point>
             </Polygon.Points>
         </Polygon>
+        -->
 
-        <Polygon Name="poly_SkipBackward" Fill="#323D98" Stroke="Black" Margin="173,479,740,10"  RenderTransformOrigin="0.5,0.5" MouseDown="poly_SkipBackward_MouseDown">
+<!--
+        <Polygon Name="poly_SkipBackward" Fill="#323D98" Stroke="Black" Margin="248,488,665,-0.5"  RenderTransformOrigin="0.5,0.5" MouseDown="poly_SkipBackward_MouseDown">
             <Polygon.Points>
-                <!-- Triangle -->
+                Triangle
                 <Point X="20" Y="5"></Point>
                 <Point X="5" Y="15"></Point>
                 <Point X="20" Y="25"></Point>
-                <!-- Bar 
+                Bar 
                 <Point X="20" Y="5"></Point>
                 <Point X="25" Y="5"></Point>
                 <Point X="25" Y="25"></Point>
-                <Point X="20" Y="25"></Point> -->
+                <Point X="20" Y="25"></Point> 
             </Polygon.Points>
         </Polygon>
-
-        <!--
-        <ProgressBar x:Name="prgBar_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,467,0,0" VerticalAlignment="Top" Width="864" Background="#000013" Foreground="#B8D541"/>
         -->
-
-        <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="67,480,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
-
-
-        <Slider Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" ValueChanged="slider_ScrubBar_ValueChanged"/>
-
-        <Slider x:Name="slider_VolumeControl" Width="200" Value="0" Orientation="Horizontal" HorizontalAlignment="Left" 
-            IsSnapToTickEnabled="False" Minimum="0" Maximum="1" TickPlacement="BottomRight" 
-            AutoToolTipPlacement="BottomRight"
-            AutoToolTipPrecision="2" IsDirectionReversed="False"
-            IsMoveToPointEnabled="False" Margin="701,480,0,39"
-            ValueChanged="slider_VolumeControl_ValueChanged"
-            Style="{StaticResource Horizontal_Slider}" />
-    </Grid>
-</Window>

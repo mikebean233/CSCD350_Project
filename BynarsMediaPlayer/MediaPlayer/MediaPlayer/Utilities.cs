@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics.PerformanceData;
 using System.IO;
 using System.Linq;
@@ -33,14 +34,13 @@ namespace MediaPlayer
             thisItem.Album = tags["album"];
             thisItem.Title = tags["title"];
             thisItem.Year = tags["year"];
-            //thisItem.Id = tags["id"];
             thisItem.Artist = tags["artist"];
             thisItem.Duration = 0;
             try { thisItem.Duration = Int32.Parse(tags["duration"]);}catch(Exception e) { }
             thisItem.Filename = tags["filename"];
             thisItem.Filetype = tags["filetype"];
             thisItem.Position = 0;
-
+            thisItem.Genre = tags["genre"];
             return thisItem;
         }
 
@@ -58,6 +58,20 @@ namespace MediaPlayer
             return hours + ":" + minutes + ":" + seconds;
         }
 
+        public static TimeSpan BuildTimspanFromPerportion(double perportion, TimeSpan totalTime)
+        {
+            if(perportion == 0.0 || totalTime == null || totalTime.TotalMilliseconds == 0)
+                return new TimeSpan(0);
+            if (perportion == 1.0)
+                return new TimeSpan(totalTime.Ticks);
+            
+            int milliseconds = (int)(totalTime.TotalMilliseconds * perportion) % 1000;
+            int seconds = (int)(totalTime.TotalSeconds * perportion) % 60;
+            int minutes = (int)(totalTime.TotalMinutes * perportion) % 60;
+            int hours = (int)(totalTime.TotalHours * perportion) % 24;
+            int days = 0;
+            return new TimeSpan(days, hours, minutes, seconds, milliseconds);
+        }
         public static bool SerializeObjectToJson<T>(string outputFileName, T obj)
         {
             try

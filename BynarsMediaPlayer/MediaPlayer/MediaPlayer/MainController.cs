@@ -2,13 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using System.Timers;
 using Timer = System.Timers.Timer;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
+using System.Windows.Media.Imaging;
 
 namespace MediaPlayer
 {
@@ -45,6 +48,8 @@ namespace MediaPlayer
         [DataMember]
         private string _currentPlaylistName;
 
+        // This variable is used to change the position of the media, it will be changed when the timer gets triggered
+        private double _requestedPositionValue;
         // private List<string> _selectedLibraryFiles;
          
         public List<string> SupportedExtentions { get { return _supportedExtentions; } } 
@@ -57,6 +62,7 @@ namespace MediaPlayer
             _stateCaptureFileName = "savedState.cfg";
             _playMode = PlayModeEnum.Consecutive;
             _timerIsChangingScrubBar = false;
+            _currentItem = new MediaItem();
         }
 
         public bool LoadSavedState()
@@ -70,7 +76,7 @@ namespace MediaPlayer
                 _playMode = lastInstance._playMode;
                 _volume = lastInstance._volume;
                 _currentPlaylistName = lastInstance._currentPlaylistName;
-
+                _currentItem = new MediaItem();
             }
             catch (Exception e)
             {
@@ -111,23 +117,31 @@ namespace MediaPlayer
             }
 
             UpdateDataGrids();
-
+        
             // Start the polling timer (which is used to update the view)
             _mediaElementPollingTimer = new Timer(150);
             _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
             _mediaElementPollingTimer.Start();
+
+            _view.Dispatcher.Invoke(new Action(() => this.UpdatePlayButtonImage()), new object[] { });
         }
 
         public void UpdateDataGrids()
         {
-            //  _view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia();
-            //_view.Dispatcher.Invoke(new Action(() => _view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
             _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
-            //_view.dataGrid_MediaL.ItemsSource = _mediaLibrary.GetMedia();
         }
 
+        private void CheckForPositionChangeRequest()
+        {
+            if (_requestedPositionValue != 0.0 && _mediaElement.NaturalDuration.HasTimeSpan)
+            {
+                _mediaElement.Position = Utilities.BuildTimspanFromPerportion(_requestedPositionValue, _mediaElement.NaturalDuration.TimeSpan);
+                _requestedPositionValue = 0.0;
+            }
+        }
         public void PollingTimerHandler(object sender, ElapsedEventArgs e)
         {
+            _view.Dispatcher.Invoke(new Action(() => CheckForPositionChangeRequest()), new object[] { });
             if (_playState == PlayStateEnum.Playing)
             {
                 _timerIsChangingScrubBar = true;
@@ -151,6 +165,22 @@ namespace MediaPlayer
                 _view.slider_ScrubBar.Value = completionRatio;
                 _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
                 _currentItem.Position = completionRatio;
+
+                // update the play mode toggle
+                _view.btn_PlayButton.ApplyTemplate();
+
+                switch (_playMode)
+                {
+                    case PlayModeEnum.Consecutive:
+                        _view.BTN_playMode.Content = "C";
+                        break;
+                    case PlayModeEnum.Repeat:
+                        _view.BTN_playMode.Content = "R";
+                        break;
+                    case PlayModeEnum.Shuffle:
+                        _view.BTN_playMode.Content = "S";
+                        break;
+                }
             }
             else
             {
@@ -179,7 +209,6 @@ namespace MediaPlayer
                 _mediaLibrary.AddNewMediaItem(thisItem);
                 UpdateDataGrids();
             }
-            //_view.Dispatcher.Invoke(new Action(() => _databaseController.retrievePlaylistToDataGrid(_view.dataGrid_MediaL)), new object[] { });
         }
 
         public void FetchMediaLibraryData() { }
@@ -195,8 +224,9 @@ namespace MediaPlayer
                     return false;
                 _currentItem = _mediaLibrary.GetCurrentMedia();
                 _mediaElement.Source = new Uri(_currentItem.Filepath);
-                if(_mediaElement.NaturalDuration.HasTimeSpan)
-                    _mediaElement.Position = new TimeSpan(0,0,0,0,(int)(_currentItem.Position * _mediaElement.NaturalDuration.TimeSpan.TotalMilliseconds));
+
+                _requestedPositionValue = _currentItem.Position;
+
                 if (_playState == PlayStateEnum.Playing)
                     _mediaElement.Play();
             }
@@ -212,63 +242,90 @@ namespace MediaPlayer
 
         #region View Events
 
-        public void MediaEnded()
+    /******************************  MAIN BUTTON EVENTS  ******************************/
+        public void PauseButtonPressed()
         {
-            _currentItem = _mediaLibrary.GetNextSong();
+            UpdatePlayButtonImage();
+        }
 
-            if (_currentItem != null)
-                _mediaElement.Source = new Uri(_currentItem.Filepath);    
+        public void PlayButtonPressed()
+        {
+            //If currently playing, switch to Paused.
+            if(_playState == PlayStateEnum.Playing)
+            {
+                _mediaElement.Pause();
+                _playState = PlayStateEnum.Paused;
+            }
+
+            //If currently paused, switch to Playing.
+            else
+            {
+                _mediaElement.Play();
+                _playState = PlayStateEnum.Playing;
+            }
+
+            UpdatePlayButtonImage();
+        }
+
+        public void UpdatePlayButtonImage()
+        {
+            if (_playState == PlayStateEnum.Paused || _playState == PlayStateEnum.Stopped)
+                _view.btn_PlayButton.Source = new BitmapImage(new Uri(@"./Images/PlayButton.png", UriKind.Relative));
+            else
+                _view.btn_PlayButton.Source = new BitmapImage(new Uri(@"./Images/PauseButton.png", UriKind.Relative));
+        }
+
+        public void RewindButtonPressed()
+        {
+            Console.WriteLine("Rewind");
+        }
+
+        public void SkipBackwardButtonPressed()
+        {
+            ChangeCurrentMedia(_mediaLibrary.GetPreviousSong());
+        }
+
+        public void StopButtonPressed()
+        {
+            _mediaElement.Stop();
+            _playState = PlayStateEnum.Stopped;
+            UpdatePlayButtonImage();
         }
 
         public void SkipForwardButtonPressed()
         {
             Console.WriteLine("Skip Forward");
-            MediaEnded();
+            ChangeCurrentMedia(_mediaLibrary.GetNextSong());
         }
 
-        public void SkipBackwardButtonPressed()
+        public void FastForwardButtonPressed()
         {
-            Console.WriteLine("Skip Backward");
-        }
-
-        public void VolumeSliderChanged(double newValue)
-        {
-            //Console.WriteLine("Volume Value: " + newValue);
-            _view.me_MediaElement.Volume = newValue;
-            _volume = newValue;
-        }
-
-        public void PlayButtonPressed()
-        {
-            //   Console.WriteLine("Play");
-            _mediaElement.Play();
-            _playState = PlayStateEnum.Playing;
-        }
-        public void StopButtonPressed()
-        {
-            //Console.WriteLine("Stop");
-            _mediaElement.Stop();
-        }
-
-        public void PauseButtonPressed()
-        {
-            //Console.WriteLine("Pause");
-            _mediaElement.Pause();
-            _playState = PlayStateEnum.Paused;
+            Console.WriteLine("Fast-Forward");
         }
 
         public void ShuffleToggled()
         {
-            if (_playMode == PlayModeEnum.Consecutive)
+            if (_playMode == PlayModeEnum.Consecutive || _playMode == PlayModeEnum.Repeat)
             {
                 _playMode = PlayModeEnum.Shuffle;
                 _view.BTN_playMode.Content = "S";
-            }else
-            if (_playMode == PlayModeEnum.Shuffle)
+            }
+
+            else
+            {
+                _playMode = PlayModeEnum.Consecutive;
+                _view.BTN_playMode.Content = "C";
+            }
+        }
+
+        public void RepeatToggled()
+        {
+            if (_playMode == PlayModeEnum.Consecutive || _playMode == PlayModeEnum.Shuffle)
             {
                 _playMode = PlayModeEnum.Repeat;
                 _view.BTN_playMode.Content = "R";
             }
+
             else
             {
                 _playMode = PlayModeEnum.Consecutive;
@@ -278,64 +335,76 @@ namespace MediaPlayer
 
         public void ProgressBarMovedByUser(double newValue)
         {
-            if (!_timerIsChangingScrubBar && _mediaElement.NaturalDuration.HasTimeSpan)
-            {
-                _mediaElementPollingTimer.Enabled = false;
+            if (!_timerIsChangingScrubBar)
+                _requestedPositionValue = newValue;
+        }
 
-                //    Console.WriteLine("ProgressBar Value: " + newValue);
-                TimeSpan totalTime = _mediaElement.NaturalDuration.TimeSpan;
-                int milliseconds   = (int)(totalTime.TotalMilliseconds * newValue) % 1000;
-                int seconds        = (int)(totalTime.TotalSeconds      * newValue) % 60;
-                int minutes        = (int)(totalTime.TotalMinutes      * newValue) % 60;
-                int hours          = (int)(totalTime.TotalHours        * newValue) % 24;
-                int days           = 0;
-                _mediaElement.Position = new TimeSpan(days, hours, minutes, seconds, milliseconds ); //_mediaElement.NaturalDuration.*newValue);
-                
-                TimeSpan timeElapsed = _mediaElement.Position;
-                _view.lbl_ScrubBarTime.Content = Utilities.BuildStringFromTimeSpan(timeElapsed) + "/" + Utilities.BuildStringFromTimeSpan(totalTime);
-                _mediaElementPollingTimer.Enabled = true;
+        public void VolumeSliderChanged(double newValue)
+        {
+            _view.me_MediaElement.Volume = newValue;
+            _volume = newValue;
+        }
+        public void PlayListItemMouseLeave(Image image, object item)
+        {
+            if (item.GetType() == typeof(MediaItem))
+            {
+                MediaItem thisItem = (MediaItem)item;
+                if (!_currentItem.Equals(thisItem))
+                    ((Image)image).Source = new BitmapImage(new Uri(@"Images\PlayFromListInActive.png", UriKind.Relative));
+            }
+
+        }
+
+        public void PlaylistItemClicked(object item)
+        {
+            if (item.GetType() == typeof(MediaItem))
+            {
+                MediaItem clickedItem = (MediaItem)item;
+                _playState = PlayStateEnum.Playing;
+                UpdatePlayButtonImage();
+                ChangeCurrentMedia(clickedItem);
+            }
+        }
+        public void PlayListItemMouseEnter(object image, object item)
+        {
+            if (item.GetType() == typeof(MediaItem))
+            {
+                MediaItem thisItem = (MediaItem)item;
+                if (!_currentItem.Equals(thisItem))
+                    ((Image)image).Source = new BitmapImage(new Uri(@"Images\PlayFromList.png", UriKind.Relative));
             }
         }
 
+        /******************************  WINDOW EVENTS  ******************************/
         public void CloseWindow()
         {
             Utilities.SerializeObjectToJson<MainController>(_stateCaptureFileName, this);
             _databaseController.AddMediaItemsToDatabase(_mediaLibrary.GetMedia());
-            if(_fileScannerThread != null && _fileScannerThread.IsAlive)
+            if (_fileScannerThread != null && _fileScannerThread.IsAlive)
                 _fileScannerThread.Abort();
             _mediaElementPollingTimer.Stop();
             _mediaElementPollingTimer.Close();
         }
-        public void MediaFileError() { }
 
-        public void DataGridRowSelected(IList items)
+
+    /******************************  MEDIA EVENTS  ******************************/
+        public void MediaEnded()
         {
-            if (items != null && items.Count != 0)
-            {
-                MediaItem selectedMedia = ((MediaItem) items[0]);
-                _currentItem = selectedMedia;
-                _mediaElement.Source = new Uri(selectedMedia.Filepath);
-                _mediaLibrary.SetCurrentMedia(selectedMedia);
-                if (_playState == PlayStateEnum.Playing)
-                    _mediaElement.Play();
-            }
-            //_selectedLibraryFiles = new List<string>();
-            //foreach(System.Data.DataRowView thisRow in items)
-            //    _selectedLibraryFiles.Add((string)thisRow.Row.ItemArray[1]);
+            if (_currentItem != null)
+                _currentItem.Position = 0.0;
+
+            ChangeCurrentMedia(_mediaLibrary.GetNextSong());
         }
 
         public void PlaylistItemDoubleClicked(ListViewItem item)
         {
-            MediaItem clickedItem = (MediaItem) (item.DataContext);
+            MediaItem clickedItem = (MediaItem)(item.DataContext);
 
             ChangeCurrentMedia(clickedItem);
-
-            //_mediaElement.Source = new Uri(clickedItem.Filepath);
-            //_mediaLibrary.SetCurrentMedia(clickedItem);
-            //if (_playState == PlayStateEnum.Playing)
-            //    _mediaElement.Play();
         }
 
+        public void MediaFileError() { }
+        
         #endregion View Events 
 
 
