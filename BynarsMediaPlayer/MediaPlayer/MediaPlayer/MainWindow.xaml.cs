@@ -31,30 +31,152 @@ namespace MediaPlayer
     public partial class MainWindow : Window
     {
         private MainController _mainController;
+        private Button[] allButtons = new Button[7];
+        
         public MainWindow()
         {
             InitializeComponent();
 
             _mainController = new MainController(this);
+
+          //Set buttons
+            //IEnumerable<Button> allButton = mainScreen.Children.OfType<Button>();
+            btn_PlayButton.Visibility = Visibility.Visible;
+            btn_PauseButton.Visibility = Visibility.Collapsed;
+
+            allButtons[0] = btn_PlayButton;
+            allButtons[1] = btn_PauseButton;
+            allButtons[2] = btn_RewindButton;
+            allButtons[3] = btn_SkipBackwardButton;
+            allButtons[4] = btn_StopButton;
+            allButtons[5] = btn_SkipForwardButton;
+            allButtons[6] = btn_FastForwardButton;
         }
 
-        private void poly_PlayButton_MouseDown(object sender, MouseButtonEventArgs e)
+    /******************************  MAIN BUTTON EVENTS  ******************************/
+      //Pause
+        private void btn_PauseButton_Click(object sender, RoutedEventArgs e)
         {
+            foreach (Button b in allButtons)
+                b.Opacity = 0.5;
+            btn_PauseButton.Opacity = 1;
+
+            this.Dispatcher.Invoke(new Action(() => _mainController.PauseButtonPressed()), new object[] { });
+        }
+
+      //Play
+        private void btn_PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Button b in allButtons)
+                b.Opacity = 0.5;
+            btn_PlayButton.Opacity = 1;
+
             this.Dispatcher.Invoke(new Action(() => _mainController.PlayButtonPressed()), new object[] { });
         }
 
-        
-        private void poly_StopButton_MouseDown(object sender, MouseButtonEventArgs e)
+      //Rewind
+        private void btn_RewindButton_Click(object sender, RoutedEventArgs e)
         {
+            foreach (Button b in allButtons)
+                b.Opacity = 0.5;
+            btn_RewindButton.Opacity = 1;
+
+            this.Dispatcher.Invoke(new Action(() => _mainController.RewindButtonPressed()), new object[] { });
+        }
+
+      //SkipBackwards
+        private void btn_SkipBackwardButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Button b in allButtons)
+                b.Opacity = 0.5;
+            btn_SkipBackwardButton.Opacity = 1;
+
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] { });
+        }
+
+      //Stop
+        private void btn_StopButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Button b in allButtons)
+                b.Opacity = 0.5;
+            btn_StopButton.Opacity = 1;
+
             this.Dispatcher.Invoke(new Action(() => _mainController.StopButtonPressed()), new object[] { });
         }
 
-        
+      //SkipForward
+        private void btn_SkipForwardButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Button b in allButtons)
+                b.Opacity = 0.5;
+            btn_SkipForwardButton.Opacity = 1;
+
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] { });
+        }
+
+      //FastForward
+        private void btn_FastForwardButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Button b in allButtons)
+                b.Opacity = 0.5;
+            btn_FastForwardButton.Opacity = 1;
+
+            this.Dispatcher.Invoke(new Action(() => _mainController.FastForwardButtonPressed()), new object[] { });
+        }
+
+      //Shuffle
+        private void toggleShuffle(object sender, RoutedEventArgs e)
+        {
+            //shuffleButton.Opacity = 1;
+            //repeatButton.Opacity = 0.5;
+
+            Dispatcher.Invoke(new Action(() => _mainController.ShuffleToggled()), new object[] { });
+        }
+
+      //Repeat
+        private void toggleRepeat(object sender, RoutedEventArgs e)
+        {
+            //shuffleButton.Opacity = 0.5;
+            //repeatButton.Opacity = 1;
+
+            Dispatcher.Invoke(new Action(() => _mainController.RepeatToggled()), new object[] { });
+        }
+
+      //ScrubBar
+        private void slider_ScrubBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
+        }
+
+      //Volume
         private void slider_VolumeControl_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             this.Dispatcher.Invoke(new Action(() => _mainController.VolumeSliderChanged(this.slider_VolumeControl.Value)), new object[] { });
         }
 
+      //Hover Buttons
+        private void btnBehavior_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Button button = (Button)sender;
+
+            if(button.Opacity != 1)
+            {
+                button.Opacity = .75;
+            }
+        }
+
+        private void btnBehavior_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Button button = (Button)sender;
+
+            if (button.Opacity == .75)
+            {
+                button.Opacity = .5;
+            }
+        }
+        
+
+    /******************************  WINDOW EVENTS  ******************************/
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             (new Thread(new ThreadStart(_mainController.Setup))).Start();
@@ -65,39 +187,8 @@ namespace MediaPlayer
             this.Dispatcher.Invoke(new Action(() => _mainController.CloseWindow()), new object[] { });
         }
 
-        private void HelpBox(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Bynars Media Player" + Environment.NewLine
-                            + "Version 1.0" + Environment.NewLine
-                            + "by: Micheal Peterson, Travis Heppner, Lexi Guches" + Environment.NewLine
-                            + "To use soft ware go to the library tab and add media to the playlist." + Environment.NewLine
-                            + "Then hit the play button in order to start the media playlist. " + Environment.NewLine
-                            + "The next button will go to the next media, while the previous will" + Environment.NewLine
-                            + "go to the previous media.  There is also two sliders to control the" + Environment.NewLine
-                            + "position of the media, and the volume of playback.");
-        }
 
-        
-        private void poly_SkipBackward_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] { });
-        }
-
-        private void poly_SkipForeward_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] { });
-        }
-
-        private void Poly_PauseButton_OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Dispatcher.Invoke(new Action(() => _mainController.PauseButtonPressed()), new object[] { });
-        }
-
-        private void slider_ScrubBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
-        }
-
+    /******************************  MEDIA EVENTS  ******************************/
         private void Me_MediaElement_OnMediaEnded(object sender, RoutedEventArgs e)
         {
             Dispatcher.Invoke(new Action(() => _mainController.MediaEnded()), new object[] { });
@@ -122,11 +213,20 @@ namespace MediaPlayer
                 obj = VisualTreeHelper.GetParent(obj);
             }
         }
-         private void toggleShuffle(object sender, RoutedEventArgs e)
+
+
+    /******************************  INFORMATION EVENTS  ******************************/
+        private void HelpBox(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(new Action(() => _mainController.ShuffleToggled()), new object[] { });
+            MessageBox.Show("Bynars Media Player" + Environment.NewLine
+                            + "Version 1.0" + Environment.NewLine
+                            + "by: Micheal Peterson, Travis Heppner, Lexi Guches" + Environment.NewLine
+                            + "To use soft ware go to the library tab and add media to the playlist." + Environment.NewLine
+                            + "Then hit the play button in order to start the media playlist. " + Environment.NewLine
+                            + "The next button will go to the next media, while the previous will" + Environment.NewLine
+                            + "go to the previous media.  There is also two sliders to control the" + Environment.NewLine
+                            + "position of the media, and the volume of playback.");
         }
     }
-
-    }
+}
 

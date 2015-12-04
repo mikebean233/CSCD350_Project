@@ -131,8 +131,10 @@
     <Resource Include="Images\RewindButton.png" />
     <Resource Include="Images\ShuffleButton.png" />
     <Resource Include="Images\SkipBackwardButton.png" />
-    <Resource Include="Images\SkipForewardButton.png" />
     <Resource Include="Images\StopButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\SkipForwardButton.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
