@@ -7,7 +7,6 @@
         Closing="Window_Closing">
 
     <Window.Resources>
-
         <Style x:Key="SliderRepeatButton" TargetType="RepeatButton">
             <Setter Property="SnapsToDevicePixels" Value="true" />
             <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -136,27 +135,47 @@
                     
                 </Grid>
             </TabItem>
+            
             <TabItem Header="Media Library" >
                 <Grid Background="#FFE5E5E5" Margin="0,0,11,-3" MaxHeight="394" MaxWidth="344">
-                    <ListView Margin="10" Name="lv_MediaLibraryView" SelectionMode="Multiple" MouseDoubleClick="lv_MediaLibraryView_OnMouseDoubleClick">
+                    <ListView Margin="10" Name="lv_MediaLibraryView" SelectionMode="Multiple">
+                        <ListView.Resources>
+  
+                        </ListView.Resources>
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn DisplayMemberBinding="{Binding IsPlaying}">
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image x:Name="RowImage" Height="25" Width="25" MouseEnter="RowImage_OnMouseEnter" MouseUp="RowImage_OnMouseUp" MouseLeave="RowImage_OnMouseLeave">
+                                            <Image.Style>
+                                                    <Style>
+                                                        <Style.Triggers>
+                                                           <DataTrigger Binding="{Binding IsPlaying}" Value="true">
+                                                                <Setter Property="Image.Source" Value="Images/PlayFromListActive.png"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsPlaying}" Value="false">
+                                                                <Setter Property="Image.Source" Value="Images/PlayFromListInActive.png"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Image.Style>
+                                            </Image>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                    
+                                    
                                     <GridViewColumn.Header>
                                         <GridViewColumnHeader Tag="isPlaying" Click="ButtonBase_OnClick">
                                             IsPlaying
                                         </GridViewColumnHeader>
                                     </GridViewColumn.Header>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Album"    DisplayMemberBinding="{Binding Album}"    />
-                                <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}"    />
-                                <GridViewColumn Header="year"     DisplayMemberBinding="{Binding Year}"     />
+                               </GridViewColumn>
+                                <GridViewColumn Header="Title"    DisplayMemberBinding="{Binding Title}"  />
+                                <GridViewColumn Header="Artist"   DisplayMemberBinding="{Binding Artist}"    />
                                 <GridViewColumn Header="Genre"    DisplayMemberBinding="{Binding Genre}"    />
-                                <GridViewColumn Header="Duration" DisplayMemberBinding="{Binding Duration}" />
-                                <GridViewColumn Header="Filename" DisplayMemberBinding="{Binding Filename}" />
-                                <GridViewColumn Header="Filetype" DisplayMemberBinding="{Binding Filetype}" />
+                                <GridViewColumn Header="year"     DisplayMemberBinding="{Binding Year}"     />
                                 <GridViewColumn Header="Filepath" DisplayMemberBinding="{Binding Filepath}" />
-                                <GridViewColumn Header="Position" DisplayMemberBinding="{Binding Position}" />
                             </GridView>
                         </ListView.View>
                     </ListView>
