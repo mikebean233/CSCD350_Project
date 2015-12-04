@@ -62,6 +62,7 @@ namespace MediaPlayer
             _stateCaptureFileName = "savedState.cfg";
             _playMode = PlayModeEnum.Consecutive;
             _timerIsChangingScrubBar = false;
+            _currentItem = new MediaItem();
         }
 
         public bool LoadSavedState()
@@ -122,7 +123,7 @@ namespace MediaPlayer
             _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
             _mediaElementPollingTimer.Start();
 
-            _view.Dispatcher.Invoke(new Action(() => this.PlayPauseButtonToggle()), new object[] { });
+            _view.Dispatcher.Invoke(new Action(() => this.UpdatePlayButtonImage()), new object[] { });
         }
 
         public void UpdateDataGrids()
@@ -208,7 +209,6 @@ namespace MediaPlayer
                 _mediaLibrary.AddNewMediaItem(thisItem);
                 UpdateDataGrids();
             }
-            //_view.Dispatcher.Invoke(new Action(() => _databaseController.retrievePlaylistToDataGrid(_view.dataGrid_MediaL)), new object[] { });
         }
 
         public void FetchMediaLibraryData() { }
@@ -245,13 +245,11 @@ namespace MediaPlayer
     /******************************  MAIN BUTTON EVENTS  ******************************/
         public void PauseButtonPressed()
         {
-            PlayPauseButtonToggle();
+            UpdatePlayButtonImage();
         }
 
         public void PlayButtonPressed()
         {
-            MessageBox.Show("Current Play State: " + _playState);
-
             //If currently playing, switch to Paused.
             if(_playState == PlayStateEnum.Playing)
             {
@@ -266,30 +264,15 @@ namespace MediaPlayer
                 _playState = PlayStateEnum.Playing;
             }
 
-            PlayPauseButtonToggle();
+            UpdatePlayButtonImage();
         }
 
-        public void PlayPauseButtonToggle()
+        public void UpdatePlayButtonImage()
         {
-            if(_playState == PlayStateEnum.Paused || _playState == PlayStateEnum.Stopped)
-            {
-                //var theImage = (Image)((ControlTemplate)_view.btn_PlayButton.Template).LoadContent();
-                //theImage.Source = new BitmapImage(new Uri(@"./Images/PauseButton.png", UriKind.Relative));
-                ((Image)(((ControlTemplate)_view.btn_PlayButton.Template).LoadContent())).Source = new BitmapImage(new Uri(@"./Images/PlayButton.png", UriKind.Relative));
-
-                //if (_view.FindName("PlayPauseButtonImage") != null)
-                    //((Image)_view.FindName("PlayPauseButtonImage")).Source = new BitmapImage(new Uri(@"./Images/PlayButton.png", UriKind.Relative));
-            }
-
+            if (_playState == PlayStateEnum.Paused || _playState == PlayStateEnum.Stopped)
+                _view.btn_PlayButton.Source = new BitmapImage(new Uri(@"./Images/PlayButton.png", UriKind.Relative));
             else
-            {
-                //var theImage = (Image)((ControlTemplate)_view.btn_PlayButton.Template).LoadContent();
-                //theImage.Source = new BitmapImage(new Uri(@"./Images/PlayButton.png", UriKind.Relative));
-                ((Image)(((ControlTemplate)_view.btn_PlayButton.Template).LoadContent())).Source = new BitmapImage(new Uri(@"./Images/PauseButton.png", UriKind.Relative)); 
-
-                //if (_view.FindName("PlayPauseButtonImage") != null)
-                    //((Image)_view.FindName("PlayPauseButtonImage")).Source = new BitmapImage(new Uri(@"./Images/PlayButton.png", UriKind.Relative));
-            }
+                _view.btn_PlayButton.Source = new BitmapImage(new Uri(@"./Images/PauseButton.png", UriKind.Relative));
         }
 
         public void RewindButtonPressed()
@@ -306,7 +289,7 @@ namespace MediaPlayer
         {
             _mediaElement.Stop();
             _playState = PlayStateEnum.Stopped;
-            PlayPauseButtonToggle();
+            UpdatePlayButtonImage();
         }
 
         public void SkipForwardButtonPressed()
@@ -417,11 +400,6 @@ namespace MediaPlayer
             MediaItem clickedItem = (MediaItem)(item.DataContext);
 
             ChangeCurrentMedia(clickedItem);
-
-            //_mediaElement.Source = new Uri(clickedItem.Filepath);
-            //_mediaLibrary.SetCurrentMedia(clickedItem);
-            //if (_playState == PlayStateEnum.Playing)
-            //    _mediaElement.Play();
         }
 
         public void MediaFileError() { }

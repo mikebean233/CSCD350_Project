@@ -43,13 +43,13 @@
                 </Grid.RowDefinitions>
                 <Track Grid.Row="1" x:Name="PART_Track"   >
                     <Track.DecreaseRepeatButton>
-                        <RepeatButton Style="{StaticResource SliderRepeatButton1}"  Command="Slider.DecreaseLarge" />
+                        <RepeatButton Style="{StaticResource SliderRepeatButton1}"/>
                     </Track.DecreaseRepeatButton>
                     <Track.Thumb>
                         <Thumb Style="{StaticResource SliderThumb}"  />
                     </Track.Thumb>
                     <Track.IncreaseRepeatButton>
-                        <RepeatButton Style="{StaticResource SliderRepeatButton}" Command="Slider.IncreaseLarge" />
+                        <RepeatButton Style="{StaticResource SliderRepeatButton}"/>
                     </Track.IncreaseRepeatButton>
                 </Track>
             </Grid>
@@ -196,129 +196,72 @@
         </Button>
 
         <!-- Controls -->
-        <Button x:Name="btn_PauseButton" 
+        <Image x:Name="btn_PauseButton" 
                 Margin="37,479,1194,13.5" 
-                Background="{x:Null}" 
-                BorderBrush="{x:Null}" 
-                BorderThickness="0" 
-                Foreground="{x:Null}"
                 Opacity=".5"
                 MouseEnter="btnBehavior_MouseEnter"
                 MouseLeave="btnBehavior_MouseLeave"
-                Click="btn_PlayButton_Click"
-                Visibility="Hidden">
-            <Button.Template>
-                <ControlTemplate>
-                    <Image Source="./Images/PauseButton.png" />
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+                MouseUp="btn_PlayButton_Click"
+                Visibility="Hidden" 
+                Source="./Images/PauseButton.png" />            
 
-        <Button x:Name="btn_PlayButton" 
+        <Image x:Name="btn_PlayButton" 
                 Margin="37,479,1194,13.5" 
-                Background="{x:Null}" 
-                BorderBrush="{x:Null}" 
-                BorderThickness="0" 
-                Foreground="{x:Null}"
                 Opacity=".5"
                 MouseEnter="btnBehavior_MouseEnter"
                 MouseLeave="btnBehavior_MouseLeave"
-                Click="btn_PlayButton_Click"
-                Visibility="Visible">
-            <Button.Template>
-                <ControlTemplate>
-                    <Image x:Name="PlayPauseButtonImage" Source="./Images/PlayButton.png" />
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+                MouseUp="btn_PlayButton_Click"
+                MouseDown="btnBehavior_MouseDown"
+                Visibility="Visible"
+                Source="./Images/PlayButton.png"/>
 
-        <Button x:Name="btn_StopButton" 
+            <Image x:Name="btn_StopButton" 
                 Margin="310,489,949,22.5" 
-                Background="{x:Null}" 
-                BorderBrush="{x:Null}" 
-                BorderThickness="0" 
-                Foreground="{x:Null}"
+
                 Opacity=".5"
                 MouseEnter="btnBehavior_MouseEnter"
                 MouseLeave="btnBehavior_MouseLeave"
-                Click="btn_StopButton_Click">
-            <Image x:Name="StopButtonImage" Source="./Images/StopButton.png" Opacity="0.5" />
-            <Button.Template>
-                <ControlTemplate>
-                    <Image Source="./Images/StopButton.png" />
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_StopButton_Click"
+                Source="./Images/StopButton.png" />
 
-        <Button x:Name="btn_SkipForwardButton" 
+        <Image x:Name="btn_SkipForwardButton" 
                 Margin="348,489,911,22.5" 
-                Background="{x:Null}" 
-                BorderBrush="{x:Null}" 
-                BorderThickness="0" 
-                Foreground="{x:Null}"
                 Opacity=".5"
                 MouseEnter="btnBehavior_MouseEnter"
                 MouseLeave="btnBehavior_MouseLeave"
-                Click="btn_SkipForwardButton_Click">
-            <Button.Template>
-                <ControlTemplate>
-                    <Image Source="./Images/SkipForwardButton.png" />
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_SkipForwardButton_Click"
+                Source="./Images/SkipForwardButton.png" />
 
-        <Button x:Name="btn_SkipBackwardButton" 
+        <Image x:Name="btn_SkipBackwardButton" 
                 Margin="272,489,987,22.5" 
-                Background="{x:Null}" 
-                BorderBrush="{x:Null}" 
-                BorderThickness="0" 
-                Foreground="{x:Null}"
                 Opacity=".5"
                 MouseEnter="btnBehavior_MouseEnter"
                 MouseLeave="btnBehavior_MouseLeave"
-                Click="btn_SkipBackwardButton_Click">
-            <Button.Template>
-                <ControlTemplate>
-                    <Image Source="./Images/SkipBackwardButton.png" />
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_SkipBackwardButton_Click"
+                Source="./Images/SkipBackwardButton.png"/>
 
-        <Button x:Name="btn_FastForwardButton" 
-                Margin="386,489,873,22.5" 
-                Background="{x:Null}" 
-                BorderBrush="{x:Null}" 
-                BorderThickness="0" 
-                Foreground="{x:Null}"
+            <Image x:Name="btn_FastForwardButton" 
+                Margin="386,489,873,22.5"
                 Opacity=".5"
                 MouseEnter="btnBehavior_MouseEnter"
                 MouseLeave="btnBehavior_MouseLeave"
-                Click="btn_FastForwardButton_Click">
-            <Button.Template>
-                <ControlTemplate>
-                    <Image Source="./Images/FastForwardButton.png" />
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_FastForwardButton_Click"
+                Source="./Images/FastForwardButton.png" />
 
-        <Button x:Name="btn_RewindButton" 
+        <Image x:Name="btn_RewindButton" 
                 Margin="234,489,1025,22.5" 
-                Background="{x:Null}" 
-                BorderBrush="{x:Null}" 
-                BorderThickness="0" 
-                Foreground="{x:Null}"
                 Opacity=".5"
                 MouseEnter="btnBehavior_MouseEnter"
                 MouseLeave="btnBehavior_MouseLeave"
-                Click="btn_RewindButton_Click">
-            <Button.Template>
-                <ControlTemplate>
-                    <Image Source="./Images/RewindButton.png" />
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+                MouseDown="btnBehavior_MouseDown"
+                MouseUp="btn_RewindButton_Click"
+                Source="./Images/RewindButton.png"/>
 
-        <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="116,487.5,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
+            <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="116,487.5,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
 
         <Slider x:Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" ValueChanged="slider_ScrubBar_ValueChanged"/>
 
