@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
+using System.Windows.Media.Imaging;
 
 namespace MediaPlayer
 {
@@ -60,6 +61,7 @@ namespace MediaPlayer
             _stateCaptureFileName = "savedState.cfg";
             _playMode = PlayModeEnum.Consecutive;
             _timerIsChangingScrubBar = false;
+            _currentItem = new MediaItem();
         }
 
         public bool LoadSavedState()
@@ -296,32 +298,36 @@ namespace MediaPlayer
         }
         public void MediaFileError() { }
 
-        public void DataGridRowSelected(IList items)
+
+        public void PlayListItemMouseEnter(object image, object item)
         {
-            if (items != null && items.Count != 0)
+            if(item.GetType() == typeof(MediaItem))
             {
-                MediaItem selectedMedia = ((MediaItem) items[0]);
-                _currentItem = selectedMedia;
-                _mediaElement.Source = new Uri(selectedMedia.Filepath);
-                _mediaLibrary.SetCurrentMedia(selectedMedia);
-                if (_playState == PlayStateEnum.Playing)
-                    _mediaElement.Play();
+                MediaItem thisItem = (MediaItem)item;
+                if (!_currentItem.Equals(thisItem))
+                    ((Image)image).Source = new BitmapImage(new Uri(@"Images\PlayFromList.png", UriKind.Relative));
             }
-            //_selectedLibraryFiles = new List<string>();
-            //foreach(System.Data.DataRowView thisRow in items)
-            //    _selectedLibraryFiles.Add((string)thisRow.Row.ItemArray[1]);
         }
 
-        public void PlaylistItemDoubleClicked(ListViewItem item)
+        public void PlayListItemMouseLeave(Image image, object item)
         {
-            MediaItem clickedItem = (MediaItem) (item.DataContext);
+            if(item.GetType() == typeof(MediaItem))
+            {
+                MediaItem thisItem = (MediaItem)item;
+                if (!_currentItem.Equals(thisItem))
+                    ((Image)image).Source = new BitmapImage(new Uri(@"Images\PlayFromListInActive.png", UriKind.Relative));
+            }
 
-            ChangeCurrentMedia(clickedItem);
+        }
 
-            //_mediaElement.Source = new Uri(clickedItem.Filepath);
-            //_mediaLibrary.SetCurrentMedia(clickedItem);
-            //if (_playState == PlayStateEnum.Playing)
-            //    _mediaElement.Play();
+        public void PlaylistItemClicked(object item)
+        {
+            if (item.GetType() == typeof (MediaItem))
+            {
+                MediaItem clickedItem = (MediaItem)item;
+
+                ChangeCurrentMedia(clickedItem);
+            }
         }
 
         public void ShuffleToggled()
@@ -330,8 +336,8 @@ namespace MediaPlayer
             {
                 _playMode = PlayModeEnum.Shuffle;
                 _view.BTN_playMode.Content = "S";
-            }else
-            if (_playMode == PlayModeEnum.Shuffle)
+            }
+            else if (_playMode == PlayModeEnum.Shuffle)
             {
                 _playMode = PlayModeEnum.Repeat;
                 _view.BTN_playMode.Content = "R";

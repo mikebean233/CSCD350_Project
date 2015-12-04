@@ -34,7 +34,7 @@ namespace MediaPlayer
         public MainWindow()
         {
             InitializeComponent();
-
+            
             _mainController = new MainController(this);
         }
 
@@ -108,7 +108,41 @@ namespace MediaPlayer
             Console.WriteLine(e);
         }
 
-        private void lv_MediaLibraryView_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+         private void toggleShuffle(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.ShuffleToggled()), new object[] { });
+        }
+
+        private void RowImage_OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            ListViewItem selectedItem = null;
+            while (obj != null && obj != lv_MediaLibraryView)
+            {
+                if (obj.GetType() == typeof(ListViewItem))
+                    Dispatcher.Invoke(new Action(() => _mainController.PlayListItemMouseLeave((Image)sender, ( (ListViewItem)obj).DataContext )), new object[] { });
+
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+        }
+
+        private void RowImage_OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            Image sourceImage = null;
+            ListViewItem selectedItem = null;
+            while (obj != null && obj != lv_MediaLibraryView)
+            {
+                 
+                if (obj.GetType() == typeof(ListViewItem))
+                    Dispatcher.Invoke(new Action(() => _mainController.PlayListItemMouseEnter((Image)sender, ((ListViewItem)obj).DataContext)), new object[] { });
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+        }
+
+        private void RowImage_OnMouseUp(object sender, MouseButtonEventArgs e)
         {
             DependencyObject obj = (DependencyObject)e.OriginalSource;
 
@@ -116,15 +150,11 @@ namespace MediaPlayer
             {
                 if (obj.GetType() == typeof(ListViewItem))
                 {
-                    Dispatcher.Invoke(new Action(() => _mainController.PlaylistItemDoubleClicked((ListViewItem)obj)), new object[] { });
+                    Dispatcher.Invoke(new Action(() => _mainController.PlaylistItemClicked( ((ListViewItem)obj).DataContext )), new object[] { });
                     break;
                 }
                 obj = VisualTreeHelper.GetParent(obj);
             }
-        }
-         private void toggleShuffle(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.Invoke(new Action(() => _mainController.ShuffleToggled()), new object[] { });
         }
     }
 
