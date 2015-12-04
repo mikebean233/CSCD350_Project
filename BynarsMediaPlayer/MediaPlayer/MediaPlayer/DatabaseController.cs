@@ -14,13 +14,10 @@ namespace MediaPlayer
     class DatabaseController
     {
         private SQLiteConnection sqlConnection;
-        //private SQLiteCommand sqlCommand;
         private int _playlistID;
-        private bool _doneLoading;
-
+        
         public DatabaseController()
         {
-            _doneLoading = false;
             if (!File.Exists("media.DB"))
             {
                 SQLiteConnection.CreateFile("media.sqlite");
@@ -39,8 +36,7 @@ namespace MediaPlayer
             }
             initPlayListID();
             Console.Out.WriteLine("done initalizing database");
-            _doneLoading = true;
-        }
+            }
 
         private void initPlayListID()
         {
@@ -182,20 +178,21 @@ namespace MediaPlayer
             }
         }
 
-        public void search(                          string toSearch, System.Windows.Controls.DataGrid target)
+        public void search(                          string toSearch, TagType searchIn, System.Windows.Controls.DataGrid target)
         {
-            searchUNSAFE("library", toSearch, target);
+            searchUNSAFE("library", toSearch, searchIn, target);
         }
-        public void search(         string playlist, string toSearch, System.Windows.Controls.DataGrid target)
+        public void search(         string playlist, string toSearch, TagType searchIn, System.Windows.Controls.DataGrid target)
         {
             string tableName = getTableName(playlist);
-            searchUNSAFE(tableName, toSearch, target);
+            searchUNSAFE(tableName, toSearch, searchIn, target);
         }
-        private void searchUNSAFE( string tableName, string toSearch, System.Windows.Controls.DataGrid target)
+        private void searchUNSAFE( string tableName, string toSearch, TagType searchIn, System.Windows.Controls.DataGrid target)
         {
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                sqlCommand.CommandText = "SELECT " + tableName + " FROM library LIKE Search";
+                sqlCommand.CommandText = "SELECT " + tableName + " FROM library WHERE @TagType LIKE @Search";
+                sqlCommand.Parameters.Add("@TagType", DbType.String).Value = getString(searchIn);
                 sqlCommand.Parameters.Add("@Seach", DbType.String).Value = "%" + toSearch + "%";
                 DataSet dataSet = new DataSet();
                 SQLiteDataAdapter adapter = new SQLiteDataAdapter(sqlCommand);
@@ -278,6 +275,22 @@ namespace MediaPlayer
                 sqlCommand.ExecuteNonQuery();
             }
 
+        }
+
+        public string getString(TagType toConvert)
+        {
+            switch (toConvert)
+            {
+                case TagType.Album:
+                    return "Album";
+                case TagType.Artist:
+                    return "Artist";
+                case TagType.Genre:
+                    return "Genre";
+                case TagType.Title:
+                    return "Title";
+            }
+            return null;
         }
     }
 }
