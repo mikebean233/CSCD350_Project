@@ -360,7 +360,8 @@ namespace MediaPlayer
             if (item.GetType() == typeof(MediaItem))
             {
                 MediaItem clickedItem = (MediaItem)item;
-
+                _playState = PlayStateEnum.Playing;
+                UpdatePlayButtonImage();
                 ChangeCurrentMedia(clickedItem);
             }
         }
