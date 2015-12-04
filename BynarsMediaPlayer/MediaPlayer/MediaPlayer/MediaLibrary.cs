@@ -120,7 +120,10 @@ namespace MediaPlayer
                 return false;
 
             if (_currentItem.Equals(newCurrent))
+            {
+                newCurrent.IsPlaying = true;
                 return true;
+            }
             else
                 _currentItem.IsPlaying = false;
 
