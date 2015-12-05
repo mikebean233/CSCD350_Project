@@ -1,0 +1,34 @@
+﻿<Window x:Class="ContextMenu.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded">
+    <Grid>
+        <Rectangle Margin="77,58,98,57" Stroke="Blue" Fill="Blue">
+            <Rectangle.ContextMenu>
+                <ContextMenu x:Name="contextMenu" AllowDrop="True">
+                    <MenuItem Header="Delete Selection" Click="MenuItem_Click" />
+                    <MenuItem Header="Add Selection to Playlist">
+                            <MenuItem>
+                            <MenuItem.Header>    
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal">
+                                       <TextBox Width="100">New PlayList</TextBox>
+                                       <Button Width="20" Content="+"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </MenuItem.Header>
+                            </MenuItem>
+                        <StackPanel x:Name="contextMenu_StackPanel_Playlists" Orientation="Vertical"/>
+                    </MenuItem>
+                    <MenuItem Header="Add New Media">
+                        <MenuItem Header="Add Files"/>
+                        <MenuItem Header="Add Files In Directory"/>
+                        <MenuItem Header="Add Files In Directory (Include Subdirectories)"/>
+                    </MenuItem>
+
+                </ContextMenu>
+            </Rectangle.ContextMenu>
+        </Rectangle>
+
+    </Grid>
+</Window>
