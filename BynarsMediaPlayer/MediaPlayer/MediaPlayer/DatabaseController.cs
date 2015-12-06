@@ -295,6 +295,22 @@ namespace MediaPlayer
             AddMediaItemsToDatabase(playlist, contents);
         }
         #endregion
+        public void removePlaylist(string playlist)
+        {
+            string tableName = getTableName(playlist);
+
+            using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
+            {
+                string sql = "DELECT FROM Playlist WHERE playlist = @playlist";
+                sqlCommand.CommandText = sql;
+                sqlCommand.Parameters.Add("@playlist", DbType.String).Value = playlist;
+                sqlCommand.ExecuteNonQuery();
+
+                sql = "DROP TABLE " + tableName;
+                sqlCommand.CommandText = sql;
+                sqlCommand.ExecuteNonQuery();
+            }
+        }
         public List<string> getPlaylists()
         {
             List<string> items = new List<string>();
