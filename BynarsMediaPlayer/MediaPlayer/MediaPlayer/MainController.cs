@@ -347,60 +347,74 @@ namespace MediaPlayer
         {
             if(_playSpeed == .25 && speed == "Faster")
             {
-                _mediaElement.SpeedRatio = .5;
+                _playSpeed = .5;
+                _mediaElement.SpeedRatio = _playSpeed;
             }
 
             else if (_playSpeed == .5)
             {
-                if(speed == "Slower")
-                    _mediaElement.SpeedRatio = .25;
+                if (speed == "Slower")
+                    _playSpeed = .25;
                 else
-                    _mediaElement.SpeedRatio = .75;
+                    _playSpeed = .75;
+
+                _mediaElement.SpeedRatio = _playSpeed;
             }
 
             else if (_playSpeed == .75)
             {
                 if (speed == "Slower")
-                    _mediaElement.SpeedRatio = .5;
+                    _playSpeed = .5;
                 else
-                    _mediaElement.SpeedRatio = 1;
+                    _playSpeed = 1;
+
+                _mediaElement.SpeedRatio = _playSpeed;
             }
 
             else if (_playSpeed == 1)
             {
                 if (speed == "Slower")
-                    _mediaElement.SpeedRatio = .75;
+                    _playSpeed = .75;
                 else
-                    _mediaElement.SpeedRatio = 1.25;
+                    _playSpeed = 1.25;
+
+                _mediaElement.SpeedRatio = _playSpeed;
             }
 
             else if (_playSpeed == 1.25)
             {
                 if (speed == "Slower")
-                    _mediaElement.SpeedRatio = 1;
+                    _playSpeed = 1;
                 else
-                    _mediaElement.SpeedRatio = 1.5;
+                    _playSpeed = 1.5;
+
+                _mediaElement.SpeedRatio = _playSpeed;
             }
 
             else if (_playSpeed == 1.5)
             {
                 if (speed == "Slower")
-                    _mediaElement.SpeedRatio = 1.25;
+                    _playSpeed = 1.25;
                 else
-                    _mediaElement.SpeedRatio = 1.75;
+                    _playSpeed = 1.75;
+
+                _mediaElement.SpeedRatio = _playSpeed;
             }
 
             else if (_playSpeed == 1.75)
             {
                 if (speed == "Slower")
-                    _mediaElement.SpeedRatio = 1.5;
+                    _playSpeed = 1.5;
                 else
-                    _mediaElement.SpeedRatio = 2;
+                    _playSpeed = 2;
+
+                _mediaElement.SpeedRatio = _playSpeed;
             }
 
             else if (_playSpeed == 2 && speed == "Slower")
             {
-                _mediaElement.SpeedRatio = 1.75;
+                _playSpeed = 1.75;
+                _mediaElement.SpeedRatio = _playSpeed;
             }
         }
 
