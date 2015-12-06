@@ -75,6 +75,7 @@
     <Compile Include="MediaItem.cs" />
     <Compile Include="PlayState.cs" />
     <Compile Include="TagManager.cs" />
+    <Compile Include="TagType.cs" />
     <Compile Include="Utilities.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

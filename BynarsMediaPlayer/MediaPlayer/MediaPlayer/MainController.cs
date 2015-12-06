@@ -116,7 +116,7 @@ namespace MediaPlayer
             {
                 _fileScanner = new FileScanner(this);
                 _fileScannerThread = new Thread(new ParameterizedThreadStart(_fileScanner.ScanDirectory));
-                _fileScannerThread.Start("C:\\");
+                _fileScannerThread.Start("C:\\users\\" + Environment.UserName);
             }
 
             UpdateDataGrids();
@@ -359,7 +359,7 @@ namespace MediaPlayer
             if (item.GetType() == typeof(MediaItem))
             {
                 MediaItem thisItem = (MediaItem)item;
-                if (!_currentItem.Equals(thisItem))
+                if (_currentItem == null || !_currentItem.Equals(thisItem))
                     ((Image)image).Source = new BitmapImage(new Uri(@"Images\PlayFromListInActive.png", UriKind.Relative));
             }
 
@@ -380,7 +380,7 @@ namespace MediaPlayer
             if (item.GetType() == typeof(MediaItem))
             {
                 MediaItem thisItem = (MediaItem)item;
-                if (!_currentItem.Equals(thisItem))
+                if (_currentItem == null || !_currentItem.Equals(thisItem))
                     ((Image)image).Source = new BitmapImage(new Uri(@"Images\PlayFromList.png", UriKind.Relative));
             }
         }

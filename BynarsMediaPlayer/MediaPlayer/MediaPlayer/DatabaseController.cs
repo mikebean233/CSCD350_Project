@@ -11,16 +11,13 @@ using System.Windows.Automation.Peers;
 
 namespace MediaPlayer
 {
-    class DatabaseController
+    public class DatabaseController
     {
         private SQLiteConnection sqlConnection;
-        //private SQLiteCommand sqlCommand;
         private int _playlistID;
-        private bool _doneLoading;
-
+        
         public DatabaseController()
         {
-            _doneLoading = false;
             if (!File.Exists("media.DB"))
             {
                 SQLiteConnection.CreateFile("media.sqlite");
@@ -33,14 +30,13 @@ namespace MediaPlayer
             {
                 sqlCommand.ExecuteNonQuery();
 
-                sql = "CREATE TABLE IF NOT EXISTS Playlists (playlist VARCHAR, tableName VARCHAR UNIQUE)";
+                sql = "CREATE TABLE IF NOT EXISTS Playlists (playlist VARCHAR UNIQUE, tableName VARCHAR UNIQUE)";
                 sqlCommand.CommandText = sql;
                 sqlCommand.ExecuteNonQuery();
             }
             initPlayListID();
             Console.Out.WriteLine("done initalizing database");
-            _doneLoading = true;
-        }
+            }
 
         private void initPlayListID()
         {
@@ -75,31 +71,17 @@ namespace MediaPlayer
                 Console.Out.WriteLine("getMediaItems");
                 
                 sqlCommand.CommandText = "SELECT * FROM library";
-                SQLiteDataReader reader = sqlCommand.ExecuteReader();//(new SQLiteCommand("SELECT * FROM library", sqlConnection)).ExecuteReader();
-
-                while (reader.Read())
+                using (SQLiteDataReader reader = sqlCommand.ExecuteReader())
                 {
                     try
                     {
-                        MediaItem thisItem = new MediaItem((string)reader["Path"])
-                        {
-                            Album = (string)reader["Album"],
-                            Artist = (string)reader["Artist"],
-                            Duration = (long)reader["Duration"],
-                            Filename = (string)reader["FileName"],
-                            Filetype = (string)reader["FileType"],
-                            Position = (double)reader["Position"],
-                            Title = (string)reader["Title"]
-                        };
-                        items.Add(thisItem);
+                        items = readerToList(reader);
                     }
-                    catch (Exception e)
+                    catch(Exception e)
                     {
                         Console.WriteLine("Error in GetMediaItemsFromDataBase: " + e);
                     }
-                }// end while
-                reader.Close();
-                reader.Dispose();
+                }
             }
             return items;
         }
@@ -120,6 +102,7 @@ namespace MediaPlayer
                 addToLibraryUNSAFE(tableName, thisItem.Filepath, thisItem.Filename, thisItem.Title, thisItem.Duration, thisItem.Artist, thisItem.Album, thisItem.Genre, thisItem.Filetype, thisItem.Position);
         }
 
+        #region addToLibrary
         public void addToLibrary(                         String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre)
         {
             string fileType = "";
@@ -181,79 +164,106 @@ namespace MediaPlayer
                 }
             }
         }
-
-        public void search(                          string toSearch, System.Windows.Controls.DataGrid target)
+        #endregion
+        #region search
+        public List<MediaItem> search(                          string toSearch, TagType searchIn)
         {
-            searchUNSAFE("library", toSearch, target);
+            return searchUNSAFE("library", toSearch, searchIn);
         }
-        public void search(         string playlist, string toSearch, System.Windows.Controls.DataGrid target)
+        public List<MediaItem> search(         string playlist, string toSearch, TagType searchIn)
         {
             string tableName = getTableName(playlist);
-            searchUNSAFE(tableName, toSearch, target);
+            return searchUNSAFE(tableName, toSearch, searchIn);
         }
-        private void searchUNSAFE( string tableName, string toSearch, System.Windows.Controls.DataGrid target)
+        private List<MediaItem> searchUNSAFE( string tableName, string toSearch, TagType searchIn)
         {
+            List<MediaItem> items = new List<MediaItem>();
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                sqlCommand.CommandText = "SELECT " + tableName + " FROM library LIKE Search";
+                sqlCommand.CommandText = "SELECT " + tableName + " FROM library WHERE @TagType LIKE @Search";
+                sqlCommand.Parameters.Add("@TagType", DbType.String).Value = getString(searchIn);
                 sqlCommand.Parameters.Add("@Seach", DbType.String).Value = "%" + toSearch + "%";
-                DataSet dataSet = new DataSet();
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter(sqlCommand);
 
-                adapter.Fill(dataSet);
-                target.ItemsSource = dataSet.Tables[0].DefaultView;
+                using (SQLiteDataReader reader = sqlCommand.ExecuteReader())
+                {
+                    try
+                    {
+                        items = readerToList(reader);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error in search: " + e);
+                    }
+                }//end using dataReader
+
+
             }
+            return items;
         }
-
-        public void retrievePlaylistToDataGrid(                           System.Windows.Controls.DataGrid target)
+        #endregion
+        #region retrievePlaylistToDataGrid
+        /// <summary>
+        /// if no argement is specified this functions as getMediaItemsFromDatabase()
+        /// </summary>
+        /// <returns></returns>
+        public List<MediaItem> retrievePlaylist()
         {
-            retrievePlaylistToDataGridUNSAFE("library", target);
+            return retrievePlaylistUNSAFE("library");
         }
-        public void retrievePlaylistToDataGrid(       string playList,    System.Windows.Controls.DataGrid target)
+        public List<MediaItem> retrievePlaylist(       string playList)
         {
             string tableName = getTableName(playList);
-            retrievePlaylistToDataGridUNSAFE(tableName, target);
+            return retrievePlaylistUNSAFE(tableName);
         }
-        private void retrievePlaylistToDataGridUNSAFE(string tableName,   System.Windows.Controls.DataGrid target)
-        { 
+        private List<MediaItem> retrievePlaylistUNSAFE(string tableName)
+        {
+            List<MediaItem> items = new List<MediaItem>();
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
                 sqlCommand.CommandText = "SELECT " + tableName + " FROM library";
-
-
-
-                DataSet dataSet = new DataSet();
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter(sqlCommand);
-
-                adapter.Fill(dataSet);
-                target.ItemsSource = dataSet.Tables[0].DefaultView;
-            }
-        }
-
-
-
-        private string getTableName(string playListName)
-        {
-            string tableName;
-            try
-            {
-                using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
+                using (SQLiteDataReader reader = sqlCommand.ExecuteReader())
                 {
-                    sqlCommand.CommandText = "SELECT tableName FROM Playlists WHERE playlist = @playlist";
-                    sqlCommand.Parameters.Add("@playlist", DbType.String).Value = playListName;
-                    SQLiteDataReader sqlReader = sqlCommand.ExecuteReader();
-                    tableName = sqlReader.GetString(0);
-                    sqlReader.Close();
-                    
+                    try
+                    {
+                        items = readerToList(reader);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error in retrievePlaylistTo: " + e);
+                    }
                 }
-                return tableName;
             }
-            catch (Exception e)
+            return items;
+            
+        }
+        #endregion
+        #region remove
+        public void remove(                         List<MediaItem> toRemove)
+        {
+            removeUnsafe("library", toRemove);
+        }
+        public void remove(       string playList,  List<MediaItem> toRemove)
+        {
+            removeUnsafe(getTableName(playList), toRemove);
+        }
+        private void removeUnsafe(string tableName, List<MediaItem> toRemove)
+        {
+            using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                return null;
+                foreach (MediaItem m in toRemove)
+                {
+                    sqlCommand.CommandText = "DELETE FROM " + tableName + " WHERE Path = @path";
+                    sqlCommand.Parameters.Add("@path", DbType.String).Value = m.Filepath;
+                    sqlCommand.ExecuteNonQuery();
+                }
             }
         }
-
+        #endregion
+        #region addPlaylist
+        /// <summary>
+        /// add a playlist to the playlist table and add the playlists table to the database.
+        /// </summary>
+        /// <param name="playlist"></param>
         public void addPlayList(string playlist)
         {
             string playlistID = getTableName(playlist);
@@ -279,6 +289,98 @@ namespace MediaPlayer
             }
 
         }
+        public void addPlaylist(string playlist, List<MediaItem> contents)
+        {
+            addPlayList(playlist);
+            AddMediaItemsToDatabase(playlist, contents);
+        }
+        #endregion
+        public List<string> getPlaylists()
+        {
+            List<string> items = new List<string>();
+            using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
+            {
+                Console.Out.WriteLine("getPlaylists");
+
+                sqlCommand.CommandText = "SELECT playlist FROM Playlists";
+                using (SQLiteDataReader reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        try
+                        {
+                            items.Add((string)reader["Playlist"]);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error in GetPlaylists: " + e);
+                        }
+                    }// end while
+                }
+            }
+            
+            return items;
+        }
+
+        #region helpers
+        private string getString(TagType toConvert)
+        {
+            switch (toConvert)
+            {
+                case TagType.Album:
+                    return "Album";
+                case TagType.Artist:
+                    return "Artist";
+                case TagType.Genre:
+                    return "Genre";
+                case TagType.Title:
+                    return "Title";
+            }
+            return null;
+        }
+
+        private List<MediaItem> readerToList(SQLiteDataReader reader)
+        {
+            List<MediaItem> items = new List<MediaItem>();
+            while (reader.Read())
+            {
+                
+                MediaItem thisItem = new MediaItem((string)reader["Path"])
+                {
+                    Album = (string)reader["Album"],
+                    Artist = (string)reader["Artist"],
+                    Duration = (long)reader["Duration"],
+                    Filename = (string)reader["FileName"],
+                    Filetype = (string)reader["FileType"],
+                    Position = (double)reader["Position"],
+                    Title = (string)reader["Title"]
+                };
+                items.Add(thisItem);
+               
+            }// end while
+
+            return items;
+        }
+
+        private string getTableName(string playListName)
+        {
+            string tableName;
+
+            using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
+            {
+                sqlCommand.CommandText = "SELECT tableName FROM Playlists WHERE playlist = @playlist";
+                sqlCommand.Parameters.Add("@playlist", DbType.String).Value = playListName;
+                SQLiteDataReader sqlReader = sqlCommand.ExecuteReader();
+                tableName = sqlReader.GetString(0);
+                sqlReader.Close();
+
+            }
+            return tableName;
+
+
+        }
+        #endregion
+
     }
 }
 
