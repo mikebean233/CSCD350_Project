@@ -139,12 +139,14 @@
     <Content Include="Images\RepeatButton.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Images\RepeatButtonActive.png" />
     <Content Include="Images\RewindButton.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\ShuffleButton.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Images\ShuffleButtonActivate.png" />
     <Content Include="Images\SkipBackwardButton.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
