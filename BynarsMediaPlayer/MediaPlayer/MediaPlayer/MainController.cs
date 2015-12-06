@@ -51,6 +51,7 @@ namespace MediaPlayer
         // This variable is used to change the position of the media, it will be changed when the timer gets triggered
         private double _requestedPositionValue;
         // private List<string> _selectedLibraryFiles;
+        private double _playSpeed = 1;
          
         public List<string> SupportedExtentions { get { return _supportedExtentions; } }
         public List<string> _playlistNames { get; set; }
@@ -287,7 +288,7 @@ namespace MediaPlayer
 
         public void RewindButtonPressed()
         {
-            Console.WriteLine("Rewind");
+            PlaySpeedCycle("Slower");
         }
 
         public void SkipBackwardButtonPressed()
@@ -304,13 +305,12 @@ namespace MediaPlayer
 
         public void SkipForwardButtonPressed()
         {
-            Console.WriteLine("Skip Forward");
             ChangeCurrentMedia(_mediaLibrary.GetNextSong());
         }
 
         public void FastForwardButtonPressed()
         {
-            Console.WriteLine("Fast-Forward");
+            PlaySpeedCycle("Faster");
         }
 
         public void ShuffleToggled()
@@ -340,6 +340,67 @@ namespace MediaPlayer
             {
                 _playMode = PlayModeEnum.Consecutive;
                 _view.BTN_playMode.Content = "C";
+            }
+        }
+
+        public void PlaySpeedCycle(string speed)
+        {
+            if(_playSpeed == .25 && speed == "Faster")
+            {
+                _mediaElement.SpeedRatio = .5;
+            }
+
+            else if (_playSpeed == .5)
+            {
+                if(speed == "Slower")
+                    _mediaElement.SpeedRatio = .25;
+                else
+                    _mediaElement.SpeedRatio = .75;
+            }
+
+            else if (_playSpeed == .75)
+            {
+                if (speed == "Slower")
+                    _mediaElement.SpeedRatio = .5;
+                else
+                    _mediaElement.SpeedRatio = 1;
+            }
+
+            else if (_playSpeed == 1)
+            {
+                if (speed == "Slower")
+                    _mediaElement.SpeedRatio = .75;
+                else
+                    _mediaElement.SpeedRatio = 1.25;
+            }
+
+            else if (_playSpeed == 1.25)
+            {
+                if (speed == "Slower")
+                    _mediaElement.SpeedRatio = 1;
+                else
+                    _mediaElement.SpeedRatio = 1.5;
+            }
+
+            else if (_playSpeed == 1.5)
+            {
+                if (speed == "Slower")
+                    _mediaElement.SpeedRatio = 1.25;
+                else
+                    _mediaElement.SpeedRatio = 1.75;
+            }
+
+            else if (_playSpeed == 1.75)
+            {
+                if (speed == "Slower")
+                    _mediaElement.SpeedRatio = 1.5;
+                else
+                    _mediaElement.SpeedRatio = 2;
+            }
+
+            else if (_playSpeed == 2 && speed == "Slower")
+            {
+                _mediaElement.SpeedRatio = 1.75;
             }
         }
 

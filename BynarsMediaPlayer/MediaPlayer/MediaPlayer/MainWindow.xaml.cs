@@ -121,6 +121,20 @@ namespace MediaPlayer
             element.Opacity = 1.0;
         }
 
+       //
+        private void btnBehavior_ChangeImageSource(string buttonNameToSwitchTo)
+        {
+            if(buttonNameToSwitchTo == "PlayButton")
+            {
+                btn_PlayButton.Source = new BitmapImage(new Uri(@"./Images/PlayButton.png", UriKind.Relative));
+            }
+
+            else if(buttonNameToSwitchTo == "PauseButton")
+            {
+                btn_PlayButton.Source = new BitmapImage(new Uri(@"./Images/PauseButton.png", UriKind.Relative));
+            }
+        }
+
 
 
         /******************************  WINDOW EVENTS  ******************************/
