@@ -52,7 +52,8 @@ namespace MediaPlayer
         private double _requestedPositionValue;
         // private List<string> _selectedLibraryFiles;
          
-        public List<string> SupportedExtentions { get { return _supportedExtentions; } } 
+        public List<string> SupportedExtentions { get { return _supportedExtentions; } }
+        public List<string> _playlistNames { get; set; }
 
         public MainController(MainWindow view)
         {
@@ -63,6 +64,8 @@ namespace MediaPlayer
             _playMode = PlayModeEnum.Consecutive;
             _timerIsChangingScrubBar = false;
             _currentItem = new MediaItem();
+            _playlistNames = new List<string>();
+            _currentPlaylistName = "";
         }
 
         public bool LoadSavedState()
@@ -130,6 +133,13 @@ namespace MediaPlayer
         {
             _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
         }
+
+        public void UpdateContextMenu()
+        {
+            bool inMediaLibrary = (_currentPlaylistName == "Media Library") ? true : false;
+            _view.Dispatcher.Invoke(new Action(() => _view.UpdateContextMenu(_playlistNames, inMediaLibrary)), new object[] { });
+        }
+
 
         private void CheckForPositionChangeRequest()
         {
@@ -374,6 +384,28 @@ namespace MediaPlayer
                     ((Image)image).Source = new BitmapImage(new Uri(@"Images\PlayFromList.png", UriKind.Relative));
             }
         }
+
+        public void ContextMenuHeaderClicked(string headerValue)
+        {
+            Console.WriteLine(headerValue);
+        }
+
+        public void ContextMenuCreatePlaylist(string playlistName)
+        {
+            if (!string.IsNullOrEmpty(playlistName) && !_playlistNames.Contains(playlistName))
+            {
+                _playlistNames.Add(playlistName);
+                UpdateContextMenu();
+            }
+
+            Console.WriteLine(playlistName);
+        }
+        public void ContextMenuPlaylistClicked(string playlistName)
+        {
+            Console.WriteLine(playlistName);
+        }
+
+
 
         /******************************  WINDOW EVENTS  ******************************/
         public void CloseWindow()

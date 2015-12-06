@@ -143,6 +143,32 @@
             <TabItem Header="Media Library" >
                 <Grid Background="#FFE5E5E5" Margin="0,0,11,-3" MaxHeight="394" MaxWidth="344">
                     <ListView Margin="10" Name="lv_MediaLibraryView" SelectionMode="Multiple">
+
+                        <ListView.ContextMenu>
+                            <ContextMenu x:Name="contextMenu" AllowDrop="True">
+                                <MenuItem Header="Delete Selection" Click="MenuItem_Click"/>
+                                <MenuItem Header="Add Selection to Playlist">
+                                    <MenuItem>
+                                        <MenuItem.Header>
+                                            <StackPanel Orientation="Vertical">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBox Width="100" x:Name="newPLaylistNameTextbox">New PlayList</TextBox>
+                                                    <Button Width="20" Content="+" Click="ContextMenu_CreatePlaylistButton_Click"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                    <StackPanel x:Name="contextMenu_StackPanel_Playlists" Orientation="Vertical"/>
+                                </MenuItem>
+                                <MenuItem Header="Add New Media" x:Name="contextMenu_MediaItem_AddNewMedia">
+                                    <MenuItem Header="Add Files" Click="MenuItem_Click"/>
+                                    <MenuItem Header="Add Files In Directory" Click="MenuItem_Click"/>
+                                    <MenuItem Header="Add Files In Directory (Include Subdirectories)" Click="MenuItem_Click"/>
+                                </MenuItem>
+
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+
                         <ListView.Resources>
 
                         </ListView.Resources>
@@ -170,7 +196,7 @@
 
 
                                     <GridViewColumn.Header>
-                                        <GridViewColumnHeader Tag="isPlaying" Click="ButtonBase_OnClick">
+                                        <GridViewColumnHeader Tag="isPlaying" Click="ContextMenu_CreatePlaylistButton_Click">
                                             IsPlaying
                                         </GridViewColumnHeader>
                                     </GridViewColumn.Header>
@@ -203,7 +229,7 @@
                 MouseLeave="btnBehavior_MouseLeave"
                 MouseUp="btn_PlayButton_Click"
                 Visibility="Hidden" 
-                Source="./Images/PauseButton.png" />            
+                Source="./Images/PauseButton.png" />
 
         <Image x:Name="btn_PlayButton" 
                 Margin="37,479,1194,13.5" 
@@ -215,7 +241,7 @@
                 Visibility="Visible"
                 Source="./Images/PlayButton.png"/>
 
-            <Image x:Name="btn_StopButton" 
+        <Image x:Name="btn_StopButton" 
                 Margin="310,489,949,22.5" 
 
                 Opacity=".5"
@@ -243,7 +269,7 @@
                 MouseUp="btn_SkipBackwardButton_Click"
                 Source="./Images/SkipBackwardButton.png"/>
 
-            <Image x:Name="btn_FastForwardButton" 
+        <Image x:Name="btn_FastForwardButton" 
                 Margin="386,489,873,22.5"
                 Opacity=".5"
                 MouseEnter="btnBehavior_MouseEnter"
@@ -261,7 +287,7 @@
                 MouseUp="btn_RewindButton_Click"
                 Source="./Images/RewindButton.png"/>
 
-            <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="116,487.5,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
+        <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="116,487.5,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
 
         <Slider x:Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" ValueChanged="slider_ScrubBar_ValueChanged"/>
 
@@ -274,72 +300,3 @@
             Style="{StaticResource Horizontal_Slider}" />
     </Grid>
 </Window>
-
-<!--
-        <Polygon Name="Poly_PauseButton" Fill="#323D98" Stroke="Black" Margin="343,480,915,24.5" MouseDown="Poly_PauseButton_OnMouseDown">
-            <Polygon.Points>
-                <Point X="5" Y="5"></Point>
-                <Point X="25" Y="5"></Point>
-                <Point X="25" Y="12"></Point>
-                <Point X="5" Y="12"></Point>
-
-                <Point X="5" Y="17"></Point>
-                <Point X="25" Y="17"></Point>
-                <Point X="25" Y="25"></Point>
-                <Point X="5" Y="25"></Point>
-            </Polygon.Points>
-        </Polygon>
-        -->
-
-<!--
-        <Polygon Name="poly_PlayButton" Fill="#323D98" Stroke="Black" Margin="37,479,879,10" MouseDown="poly_PlayButton_MouseDown">
-            <Polygon.Points>
-                <Point X="0" Y="0"></Point>
-                <Point X="20" Y="15"></Point>
-                <Point X="0" Y="30"></Point>
-            </Polygon.Points>
-        </Polygon>
-        -->
-
-<!--
-        <Polygon Name="poly_StopButton" Fill="#323D98" Stroke="Black" Margin="282,479,629,9.5" MouseDown="poly_StopButton_MouseDown">
-            <Polygon.Points>
-                <Point X="5" Y="5"></Point>
-                <Point X="25" Y="5"></Point>
-                <Point X="25" Y="25"></Point>
-                <Point X="5" Y="25"></Point>
-            </Polygon.Points>
-        </Polygon>
-        -->
-
-<!--
-        <Polygon Name="poly_SkipForeward" Fill="#323D98" Stroke="Black" Margin="332,484,579,3.5" MouseDown="poly_SkipForeward_MouseDown">
-            <Polygon.Points>
-                Triangle
-                <Point X="5" Y="5"></Point>
-                <Point X="20" Y="15"></Point>
-                <Point X="5" Y="25"></Point>
-                Bar 
-                <Point X="20" Y="5"></Point>
-                <Point X="25" Y="5"></Point>
-                <Point X="25" Y="25"></Point>
-                <Point X="20" Y="25"></Point>
-            </Polygon.Points>
-        </Polygon>
-        -->
-
-<!--
-        <Polygon Name="poly_SkipBackward" Fill="#323D98" Stroke="Black" Margin="248,488,665,-0.5"  RenderTransformOrigin="0.5,0.5" MouseDown="poly_SkipBackward_MouseDown">
-            <Polygon.Points>
-                Triangle
-                <Point X="20" Y="5"></Point>
-                <Point X="5" Y="15"></Point>
-                <Point X="20" Y="25"></Point>
-                Bar 
-                <Point X="20" Y="5"></Point>
-                <Point X="25" Y="5"></Point>
-                <Point X="25" Y="25"></Point>
-                <Point X="20" Y="25"></Point> 
-            </Polygon.Points>
-        </Polygon>
-        -->
