@@ -134,7 +134,7 @@ namespace MediaPlayer
                 try
                 {
                     List<MediaItem> thisList = _databaseController.retrievePlaylist(thisPlaylistName);
-                    if (thisList != null && thisList.Any())
+                    if (thisList != null)
                     {
                         MediaLibrary thisPlaylist = new MediaLibrary(thisPlaylistName, this);
                         thisPlaylist.AddRange(thisList);
@@ -284,7 +284,7 @@ namespace MediaPlayer
 
         public MediaLibrary GetPlaylistByName(string playlistName)
         {
-            if (String.IsNullOrEmpty(playlistName) || _playlistNames.Contains(playlistName))
+            if (String.IsNullOrEmpty(playlistName) || !_playlistNames.Contains(playlistName))
                 return new MediaLibrary("", this); // return a null object, we should never neeed this
 
             foreach (MediaLibrary thisPlaylist in _playlists)
@@ -396,7 +396,7 @@ namespace MediaPlayer
             {
                 if (!_currentPlaylist.SetCurrentMedia(_newItem))
                     return false;
-                _currentItem = _mediaLibrary.GetCurrentMedia();
+                _currentItem = _currentPlaylist.GetCurrentMedia();
                 _mediaElement.Source = new Uri(_currentItem.Filepath);
 
                 _requestedPositionValue = _currentItem.Position;
@@ -671,7 +671,7 @@ namespace MediaPlayer
             if (_currentItem != null)
                 _currentItem.Position = 0.0;
 
-            ChangeCurrentMedia(_mediaLibrary.GetNextSong());
+            ChangeCurrentMedia(_currentPlaylist.GetNextSong());
         }
 
         public void PlaylistItemDoubleClicked(ListViewItem item)

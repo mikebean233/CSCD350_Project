@@ -76,6 +76,9 @@ namespace MediaPlayer
             if(string.IsNullOrEmpty(Filepath) || (obj.GetType() != this.GetType()))
                 return false;
 
+            MediaItem that = (MediaItem) obj;
+            if (String.IsNullOrEmpty(that.Filepath))
+                return false;
             return Filepath.Equals(((MediaItem)obj).Filepath);
         }
 
