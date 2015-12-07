@@ -307,6 +307,11 @@ namespace MediaPlayer
             {
             }
         }
+
+        private void SearchImage_OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
