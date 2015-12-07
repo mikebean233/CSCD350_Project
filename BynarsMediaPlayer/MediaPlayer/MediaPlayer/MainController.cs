@@ -91,10 +91,7 @@ namespace MediaPlayer
                 _currentPlaylistName = lastInstance._currentPlaylistName;
                 if (_currentPlaylistName == "")
                     _currentPlaylistName = "Media Library";
-                _currentPlaylist = GetPlaylistByName(_currentPlaylistName);
-                SetCurrentPlaylist(_currentPlaylistName);   
-                UpdateCurrentPlaylistTab();
-
+                
             }
             catch (Exception e)
             {
@@ -160,10 +157,17 @@ namespace MediaPlayer
                 _fileScannerThread.Start("C:\\users\\" + Environment.UserName);
             }
 
-            //_view.Dispatcher.Invoke(new Action(() => UpdateView()), new object[] { });
+            // Get the player back to the playlist and media it was at before the last shut down
+            _currentPlaylist = GetPlaylistByName(_currentPlaylistName);
+            _currentPlaylist.SetCurrentMedia(_currentItem);
+            ChangeCurrentMedia(_currentPlaylist.GetCurrentMedia());
+
             UpdateDataGrids();
             UpdateContextMenu();
-             // Start the polling timer (which is used to update the view)
+            _view.Dispatcher.Invoke(new Action(() => UpdatePlaylistsTab()), new object[] { });
+
+
+            // Start the polling timer (which is used to update the view)
             _mediaElementPollingTimer.Start();
 
         }
@@ -333,7 +337,7 @@ namespace MediaPlayer
                 // Update Progress Slider
                 double completionRatio = timeElapsed.TotalMilliseconds/totalTime.TotalMilliseconds;
                 _view.slider_ScrubBar.Value = completionRatio;
-                UpdateDataGrids();
+               // UpdateDataGrids();
                 _currentItem.Position = completionRatio;
             }
             else
@@ -415,8 +419,19 @@ namespace MediaPlayer
 
                 _requestedPositionValue = _currentItem.Position;
 
-                if (_playState == PlayStateEnum.Playing)
-                    _mediaElement.Play();
+                switch (_playState)
+                {
+                    case PlayStateEnum.Paused:
+                        _mediaElement.Pause();
+                        break;
+                    case PlayStateEnum.Playing:
+                        _mediaElement.Play();
+                        break;
+                    case PlayStateEnum.Stopped:
+                        _mediaElement.Stop();
+                        break;
+                }
+
             }
             catch (Exception e)
             {
@@ -471,6 +486,7 @@ namespace MediaPlayer
         public void SkipBackwardButtonPressed()
         {
             ChangeCurrentMedia(_currentPlaylist.GetPreviousSong());
+            UpdateDataGrids();
         }
 
         public void StopButtonPressed()
@@ -482,8 +498,8 @@ namespace MediaPlayer
 
         public void SkipForwardButtonPressed()
         {
-            Console.WriteLine("Skip Forward");
             ChangeCurrentMedia(_currentPlaylist.GetNextSong());
+            UpdateDataGrids();
         }
 
         public void FastForwardButtonPressed()
@@ -617,6 +633,7 @@ namespace MediaPlayer
                 UpdatePlayButtonImage();
                 ChangeCurrentMedia(clickedItem);
             }
+            UpdateDataGrids();
         }
 
         public void PlaylistDeleteClicked(string playlistName)
@@ -657,11 +674,9 @@ namespace MediaPlayer
             {
                 case "Delete Selection":
                     RemoveMediaFromPlaylist(_currentPlaylistName, newItems);
-                    UpdateDataGrids();
                     break;
                 case "Add Selection to Playlist":
                     AddMediaToPlaylist(_currentPlaylistName, newItems);
-                    UpdateDataGrids();
                     break;
                 case "Add Files":
                     // TODO: wirte a method that gets files from a dialog, 
@@ -671,14 +686,13 @@ namespace MediaPlayer
                 case "Add Files In Directory":
                     // TODO: write a method that gets a directory, use the scanner to find all the matching files
                     //       in that directory, create mediaItems from those files, then put those MediaItems into the current playlist.
-                    UpdateDataGrids();
                     break;
                 case "Add Files In Directory (Include Subdirectories":
                     // TODO: Same as previous, but search recursivly through the directories.
                     break;
+                    
             }
-
-            Console.WriteLine(headerValue);
+            UpdateDataGrids();
         }
 
         public void ContextMenuCreatePlaylist(string playlistName)
@@ -726,16 +740,13 @@ namespace MediaPlayer
                 _currentItem.Position = 0.0;
 
             ChangeCurrentMedia(_currentPlaylist.GetNextSong());
+            UpdateDataGrids();
         }
 
-        public void PlaylistItemDoubleClicked(ListViewItem item)
+        public void MediaFileError()
         {
-            MediaItem clickedItem = (MediaItem)(item.DataContext);
-
-            ChangeCurrentMedia(clickedItem);
+            ChangeCurrentMedia(_currentPlaylist.GetNextSong());
         }
-
-        public void MediaFileError() { }
         
         #endregion View Events 
 

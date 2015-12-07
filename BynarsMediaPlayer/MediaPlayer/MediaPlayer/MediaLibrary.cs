@@ -156,6 +156,9 @@ namespace MediaPlayer
 
         public MediaItem GetPreviousSong()
         {
+            if(_mainController.PlayMode == PlayModeEnum.Repeat)
+                return _currentItem;
+            
             if (_currentItem != null)
                 _currentItem.IsPlaying = false;
 
