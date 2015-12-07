@@ -323,13 +323,6 @@ namespace MediaPlayer
                 _view.slider_ScrubBar.Value = completionRatio;
                 UpdateDataGrids();
                 _currentItem.Position = completionRatio;
-
-                // Update the play/pause button image
-                UpdatePlayButtonImage();
-
-                // Update the play mode buttons
-                UpdatePlayModeButtons();
-                
             }
             else
             {
@@ -339,6 +332,12 @@ namespace MediaPlayer
 
             //Update the Volume Slider
             _view.slider_VolumeControl.Value = _volume;
+
+            // Update the play/pause button image
+            UpdatePlayButtonImage();
+
+            // Update the play mode buttons
+            UpdatePlayModeButtons();
 
         }
 
