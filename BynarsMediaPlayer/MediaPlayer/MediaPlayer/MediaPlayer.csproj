@@ -43,6 +43,7 @@
     </Reference>
     <Reference Include="Id3Lib">
       <HintPath>.\Id3Lib.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="Mp3Lib">
       <HintPath>.\Mp3Lib.dll</HintPath>
