@@ -85,6 +85,7 @@
     </ApplicationDefinition>
     <Compile Include="MediaLibrary.cs" />
     <Compile Include="MediaItem.cs" />
+    <Compile Include="PlaylistViewRow.cs" />
     <Compile Include="PlayState.cs" />
     <Compile Include="TagManager.cs" />
     <Compile Include="TagType.cs" />
@@ -137,6 +138,7 @@
     <Content Include="Images\PlayButton.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Images\Trash.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\ExpandMenuButton.png">

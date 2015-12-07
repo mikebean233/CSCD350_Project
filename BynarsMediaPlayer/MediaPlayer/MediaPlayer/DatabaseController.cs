@@ -297,7 +297,7 @@ namespace MediaPlayer
 
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                string sql = "DELECT FROM Playlist WHERE playlist = @playlist";
+                string sql = "DELETE FROM Playlists WHERE playlist = @playlist";
                 sqlCommand.CommandText = sql;
                 sqlCommand.Parameters.Add("@playlist", DbType.String).Value = playlist;
                 sqlCommand.ExecuteNonQuery();

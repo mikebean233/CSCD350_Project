@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,7 +19,7 @@ using System.Windows.Media.Imaging;
 namespace MediaPlayer
 {
     [DataContract]
-    class MainController
+    public class MainController
     {
         private MainWindow _view;
         [DataMember]
@@ -139,6 +140,7 @@ namespace MediaPlayer
                     if (thisList != null)
                     {
                         MediaLibrary thisPlaylist = new MediaLibrary(thisPlaylistName, this);
+                        thisPlaylist.Deletable = true;
                         thisPlaylist.AddRange(thisList);
                         _playlists.Add(thisPlaylist);
                     }
@@ -158,11 +160,10 @@ namespace MediaPlayer
                 _fileScannerThread.Start("C:\\users\\" + Environment.UserName);
             }
 
-            _view.Dispatcher.Invoke(new Action(() => UpdateView()), new object[] { });
-
-
-
-            // Start the polling timer (which is used to update the view)
+            //_view.Dispatcher.Invoke(new Action(() => UpdateView()), new object[] { });
+            UpdateDataGrids();
+            UpdateContextMenu();
+             // Start the polling timer (which is used to update the view)
             _mediaElementPollingTimer.Start();
 
         }
@@ -201,7 +202,7 @@ namespace MediaPlayer
             {
                 _databaseController.addPlayList(playlistName);
                 _playlistNames.Add(playlistName);
-                _playlists.Add(new MediaLibrary(playlistName,this));
+                _playlists.Add(new MediaLibrary(playlistName,this) {Deletable = true});
                 return true;
             }
             catch (Exception e)
@@ -220,7 +221,18 @@ namespace MediaPlayer
         public void UpdateDataGrids()
         {
             _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _currentPlaylist.GetMedia()), new object[] { });
+            _view.Dispatcher.Invoke(new Action(UpdatePlaylistsTab), new object[] { });
         }
+
+        public void UpdatePlaylistsTab()
+        {
+            _view.lv_Playlists.Items.Clear();
+            _view.lv_Playlists.Items.Add(new PlaylistViewRow() {Name = "Media Library", Deletable = false});
+
+            foreach (string thisPlaylist in _playlistNames)
+                _view.lv_Playlists.Items.Add(new PlaylistViewRow() {Name = thisPlaylist, Deletable = true});
+        }
+
 
         public void UpdateContextMenu()
         {
@@ -281,7 +293,7 @@ namespace MediaPlayer
         }
         public bool RemoveMediaFromPlaylist(string playlistName, List<MediaItem> mediaItems)
         {
-            if (String.IsNullOrEmpty(playlistName) || !_playlistNames.Contains(playlistName) || mediaItems == null || !mediaItems.Any())
+            if (String.IsNullOrEmpty(playlistName) || (!_playlistNames.Contains(playlistName) && playlistName != "Media Library") || mediaItems == null || !mediaItems.Any())
                 return false;
 
             MediaLibrary thisPlaylist = GetPlaylistByName(playlistName);
@@ -606,6 +618,22 @@ namespace MediaPlayer
                 ChangeCurrentMedia(clickedItem);
             }
         }
+
+        public void PlaylistDeleteClicked(string playlistName)
+        {
+            MediaLibrary clickedItem = GetPlaylistByName(playlistName);      
+            if (_currentPlaylistName == playlistName)
+                SetCurrentPlaylist("MediaLibrary");
+            RemovePlaylist(clickedItem.Name);
+            UpdateDataGrids();    
+        }
+
+        public void PlaylistSelected(string playlistName)
+        {
+            if(!String.IsNullOrEmpty(playlistName))
+                SetCurrentPlaylist(playlistName);
+        }
+
         public void PlayListItemMouseEnter(object image, object item)
         {
             if (item.GetType() == typeof(MediaItem))
@@ -616,23 +644,57 @@ namespace MediaPlayer
             }
         }
 
-        public void ContextMenuHeaderClicked(string headerValue)
+        public void ContextMenuHeaderClicked(string headerValue, IList selectedItems)
         {
+            List<MediaItem> newItems = new List<MediaItem>();
+            foreach (object thisItem in selectedItems)
+                newItems.Add((MediaItem)thisItem);
+
+
+            if (String.IsNullOrEmpty(headerValue))
+                return;
+            switch (headerValue)
+            {
+                case "Delete Selection":
+                    RemoveMediaFromPlaylist(_currentPlaylistName, newItems);
+                    UpdateDataGrids();
+                    break;
+                case "Add Selection to Playlist":
+                    AddMediaToPlaylist(_currentPlaylistName, newItems);
+                    UpdateDataGrids();
+                    break;
+                case "Add Files":
+                    // TODO: wirte a method that gets files from a dialog, 
+                    //       get mediaItems from those files, then put those files into the current playlist
+                    UpdateDataGrids();
+                    break;
+                case "Add Files In Directory":
+                    // TODO: write a method that gets a directory, use the scanner to find all the matching files
+                    //       in that directory, create mediaItems from those files, then put those MediaItems into the current playlist.
+                    UpdateDataGrids();
+                    break;
+                case "Add Files In Directory (Include Subdirectories":
+                    // TODO: Same as previous, but search recursivly through the directories.
+                    break;
+            }
+
             Console.WriteLine(headerValue);
         }
 
         public void ContextMenuCreatePlaylist(string playlistName)
         {
-            if (!string.IsNullOrEmpty(playlistName) && !_playlistNames.Contains(playlistName))
-            {
-                _playlistNames.Add(playlistName);
-                UpdateContextMenu();
-            }
+            CreatePlaylist(playlistName);
+            UpdateContextMenu();
 
             Console.WriteLine(playlistName);
         }
-        public void ContextMenuPlaylistClicked(string playlistName)
+        public void ContextMenuPlaylistClicked(string playlistName, IList selectedItems)
         {
+            List<MediaItem> newItems = new List<MediaItem>();
+            foreach(object thisItem in selectedItems)
+                newItems.Add((MediaItem)thisItem);
+
+            AddMediaToPlaylist(playlistName, newItems);
             Console.WriteLine(playlistName);
         }
 
