@@ -49,7 +49,7 @@ namespace MediaPlayer
                     SQLiteDataReader sqlReader = sqlCommand.ExecuteReader();
 
 
-                    _playlistID = Int32.Parse(sqlReader.GetString(0));
+                    _playlistID = Int32.Parse(sqlReader.GetString(0).Substring(8));
                     sqlReader.Close();
                     sqlReader.Dispose();
                 }
@@ -266,18 +266,14 @@ namespace MediaPlayer
         /// <param name="playlist"></param>
         public void addPlayList(string playlist)
         {
-            string playlistID = getTableName(playlist);
-            if (playlistID == null)
-            {
-                playlistID = "playlist" + _playlistID;
-                _playlistID++;
-            }
-            else
-                throw new DuplicateNameException("Playlist '" + playlist + "' already exists.");
+
+            string playlistID = "playlist" + _playlistID;
+            _playlistID++;
+
 
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                string sql = "INSERT INTO Playlist (playlist, tableName) VALUES (?,?)";
+                string sql = "INSERT INTO Playlists (playlist, tableName) VALUES (?,?)";
                 sqlCommand.CommandText = sql;
                 sqlCommand.Parameters.Add("@playlist", DbType.String).Value = playlist;
                 sqlCommand.Parameters.Add("@tableName", DbType.String).Value = playlistID;

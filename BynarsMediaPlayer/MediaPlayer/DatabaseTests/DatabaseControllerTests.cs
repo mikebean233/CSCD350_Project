@@ -111,7 +111,17 @@ namespace MediaPlayer.Tests
         [TestMethod()]
         public void addPlayListTest()
         {
-            Assert.Fail();
+            DBCon = new DatabaseController();
+            try
+            {
+                DBCon.addPlayList("");
+                DBCon.addPlayList("123");
+                DBCon.addPlayList("new play list");
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
         }
 
         [TestMethod()]
