@@ -41,6 +41,7 @@ namespace MediaPlayer
                 throw new Exception("An attempt was made to create a media item without a path");
             Filepath = path;
             IsPlaying = false;
+            Filename = "";
             Position = 0.0;
             Duration = 0;
             Album = "";

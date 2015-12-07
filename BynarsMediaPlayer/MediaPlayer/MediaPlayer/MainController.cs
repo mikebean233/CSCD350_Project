@@ -160,6 +160,7 @@ namespace MediaPlayer
             // Get the player back to the playlist and media it was at before the last shut down
             _currentPlaylist = GetPlaylistByName(_currentPlaylistName);
             _currentPlaylist.SetCurrentMedia(_currentItem);
+            SetCurrentPlaylist(_currentPlaylistName);
             ChangeCurrentMedia(_currentPlaylist.GetCurrentMedia());
 
             UpdateDataGrids();
