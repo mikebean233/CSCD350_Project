@@ -158,7 +158,7 @@
     <Content Include="Images\ShuffleButton.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Images\ShuffleButtonActivate.png" />
+    <Resource Include="Images\ShuffleButtonActive.png" />
     <Content Include="Images\SkipBackwardButton.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace MediaPlayer
@@ -92,6 +93,7 @@ namespace MediaPlayer
                 _currentPlaylist = GetPlaylistByName(_currentPlaylistName);
                 SetCurrentPlaylist(_currentPlaylistName);   
                 UpdateCurrentPlaylistTab();
+
             }
             catch (Exception e)
             {
@@ -156,20 +158,12 @@ namespace MediaPlayer
                 _fileScannerThread.Start("C:\\users\\" + Environment.UserName);
             }
 
-            UpdateDataGrids();
-        
+            _view.Dispatcher.Invoke(new Action(() => UpdateView()), new object[] { });
+
+
+
             // Start the polling timer (which is used to update the view)
             _mediaElementPollingTimer.Start();
-
-            _view.Dispatcher.Invoke(new Action(() => this.UpdatePlayButtonImage()), new object[] { });
-
-            List<MediaItem> tempSongs = _mediaLibrary.GetMedia();
-
-            CreatePlaylist("Mikes Mix");
-
-            AddMediaToPlaylist("Mikes Mix", _mediaLibrary.GetMedia().GetRange(0, 5));
-
-            SetCurrentPlaylist("Mikes Mix");
 
         }
 
@@ -234,6 +228,24 @@ namespace MediaPlayer
             _view.Dispatcher.Invoke(new Action(() => _view.UpdateContextMenu(_playlistNames, inMediaLibrary)), new object[] { });
         }
 
+        public void UpdatePlayModeButtons()
+        {
+            switch (_playMode)
+            {
+                case PlayModeEnum.Consecutive:
+                    _view.btn_ShuffleButton.Source = new BitmapImage(new Uri(@"Images\ShuffleButton.png", UriKind.Relative));
+                    _view.btn_RepeatButton.Source = new BitmapImage(new Uri(@"images\RepeatButton.png", UriKind.Relative));
+                    break;
+                case PlayModeEnum.Repeat:
+                    _view.btn_ShuffleButton.Source = new BitmapImage(new Uri(@"Images\ShuffleButton.png", UriKind.Relative));
+                    _view.btn_RepeatButton.Source = new BitmapImage(new Uri(@"Images\RepeatButtonActive.png", UriKind.Relative));
+                    break;
+                case PlayModeEnum.Shuffle:
+                    _view.btn_ShuffleButton.Source = new BitmapImage(new Uri(@"Images\ShuffleButtonActive.png", UriKind.Relative));
+                    _view.btn_RepeatButton.Source =  new BitmapImage(new Uri(@"Images\RepeatButton.png", UriKind.Relative));
+                    break;
+            }
+        }
 
         private void CheckForPositionChangeRequest()
         {
@@ -312,21 +324,12 @@ namespace MediaPlayer
                 UpdateDataGrids();
                 _currentItem.Position = completionRatio;
 
-                // update the play mode toggle
-                _view.btn_PlayButton.ApplyTemplate();
+                // Update the play/pause button image
+                UpdatePlayButtonImage();
 
-                switch (_playMode)
-                {
-                    case PlayModeEnum.Consecutive:
-                        _view.BTN_playMode.Content = "C";
-                        break;
-                    case PlayModeEnum.Repeat:
-                        _view.BTN_playMode.Content = "R";
-                        break;
-                    case PlayModeEnum.Shuffle:
-                        _view.BTN_playMode.Content = "S";
-                        break;
-                }
+                // Update the play mode buttons
+                UpdatePlayModeButtons();
+                
             }
             else
             {
@@ -480,31 +483,21 @@ namespace MediaPlayer
         public void ShuffleToggled()
         {
             if (_playMode == PlayModeEnum.Consecutive || _playMode == PlayModeEnum.Repeat)
-            {
                 _playMode = PlayModeEnum.Shuffle;
-                _view.BTN_playMode.Content = "S";
-            }
-
             else
-            {
                 _playMode = PlayModeEnum.Consecutive;
-                _view.BTN_playMode.Content = "C";
-            }
+
+            UpdatePlayModeButtons();
         }
 
         public void RepeatToggled()
         {
             if (_playMode == PlayModeEnum.Consecutive || _playMode == PlayModeEnum.Shuffle)
-            {
                 _playMode = PlayModeEnum.Repeat;
-                _view.BTN_playMode.Content = "R";
-            }
-
             else
-            {
                 _playMode = PlayModeEnum.Consecutive;
-                _view.BTN_playMode.Content = "C";
-            }
+
+            UpdatePlayModeButtons();
         }
 
         public void PlaySpeedCycle(string speed)
