@@ -134,13 +134,7 @@
 
         <!-- Library -->
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="361">
-            <TabItem Header="Playlist 1">
-                <Grid Background="#FFE5E5E5" Margin="0,0,-6,0">
-
-
-                </Grid>
-            </TabItem>
-            <TabItem Header="Media Library" >
+            <TabItem x:Name="TabItem_CurrentPlaylist" Header="PlayLists" >
                 <Grid Background="#FFE5E5E5" Margin="0,0,11,-3" MaxHeight="394" MaxWidth="344">
                     <ListView Margin="10" Name="lv_MediaLibraryView" SelectionMode="Multiple">
 
@@ -212,7 +206,12 @@
 
                 </Grid>
             </TabItem>
+            <TabItem x:Name="TabItem_Playlists" Header="">
+                <Grid Background="#FFE5E5E5" Margin="0,0,-6,0">
 
+
+                </Grid>
+            </TabItem>
         </TabControl>
         <Button x:Name="BTN_help" Style="{StaticResource ResourceKey=mediaButton}" Content="?" HorizontalAlignment="Center" Margin="676,479,602,0" VerticalAlignment="Top" Width="20" Height="20" Click="HelpBox" Foreground="#FFFBFBFB"/>
         <Button x:Name="BTN_playMode" Style="{StaticResource ResourceKey=mediaButton}" Content="C" Margin="674,0,601,12.5" Width="Auto" Background="#FFE6E1E1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="toggleShuffle" Height="22">

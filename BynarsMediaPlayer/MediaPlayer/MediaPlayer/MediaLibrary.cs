@@ -20,11 +20,12 @@ namespace MediaPlayer
 
         public MediaLibrary(string name, MainController mainController)
         {
-            _name = name;
+            _name = (string.IsNullOrEmpty(name)) ? "" : name;
             _mainController = mainController;
             _library = new HashSet<MediaItem>();
             _itemPointer = _library.GetEnumerator();
             _reverseLibrary = new LinkedList<MediaItem>();
+            _currentItem = new MediaItem();
         }
 
         public string Name
@@ -36,8 +37,8 @@ namespace MediaPlayer
         {
             if (item != null && !_library.Contains(item))
             {
-                _reverseLibrary.AddFirst(item);
-                _library.Add(item);
+                _reverseLibrary.AddFirst(item.Clone());
+                _library.Add(item.Clone());
             }
             if (_library.Count == 1)
             {
@@ -72,12 +73,21 @@ namespace MediaPlayer
 
             return _library.Count;
         }
-
+        
         public MediaItem GetCurrentMedia()
         {
+            if (_currentItem.Filepath == "" && _library.Any())
+            {
+                if(_itemPointer != null)
+                    _itemPointer.Dispose();
+                _itemPointer = _library.GetEnumerator();
+                _itemPointer.MoveNext();
+                _currentItem = _itemPointer.Current;
+            }
+            
             return _currentItem;
         }
-
+        
         public List<MediaItem> GetMedia()
         {
             return _library.ToList();
@@ -98,8 +108,8 @@ namespace MediaPlayer
             {
                 if (!_library.Contains(thisItem))
                 {
-                    _reverseLibrary.AddFirst(thisItem);
-                    _library.Add(thisItem);
+                    _reverseLibrary.AddFirst(thisItem.Clone());
+                    _library.Add(thisItem.Clone());
                 }
             }
             ResetItemPointerToCurrent();
@@ -160,6 +170,7 @@ namespace MediaPlayer
             {// Using a null object, this should never be necessary...
                 _currentItem = new MediaItem();
             }
+
             _currentItem.IsPlaying = true;
             ResetItemPointerToCurrent();
             return _currentItem;
@@ -200,5 +211,24 @@ namespace MediaPlayer
             return _currentItem;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null || (obj.GetType() != this.GetType()) || this._name == "")
+                return false;
+            MediaLibrary that = (MediaLibrary) obj;
+            if (that._name == "")
+                return false;
+
+            return _name.Equals(that.Name);
+        }
+        public override int GetHashCode()
+        {
+            return _name.GetHashCode();
+        }
+ 
+        public override string ToString()
+        {
+            return _name + ": " + _library.Count;
+        }
     }
 }
