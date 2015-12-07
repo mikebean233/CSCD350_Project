@@ -31,7 +31,7 @@ namespace MediaPlayer
     public partial class MainWindow : Window
     {
         private MainController _mainController;
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -39,89 +39,106 @@ namespace MediaPlayer
             _mainController = new MainController(this);
         }
 
-    /******************************  MAIN BUTTON EVENTS  ******************************/
-      //Play
+        /******************************  MAIN BUTTON EVENTS  ******************************/
+        //Play
         private void btn_PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.PlayButtonPressed()), new object[] { });
+            this.Dispatcher.Invoke(new Action(() => _mainController.PlayButtonPressed()), new object[] {});
         }
 
-      //Rewind
+        //Rewind
         private void btn_RewindButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.RewindButtonPressed()), new object[] { });
+            this.Dispatcher.Invoke(new Action(() => _mainController.RewindButtonPressed()), new object[] {});
         }
 
-      //SkipBackwards
+        //SkipBackwards
         private void btn_SkipBackwardButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] { });
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipBackwardButtonPressed()), new object[] {});
         }
 
-      //Stop
+        //Stop
         private void btn_StopButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.StopButtonPressed()), new object[] { });
+            this.Dispatcher.Invoke(new Action(() => _mainController.StopButtonPressed()), new object[] {});
         }
 
-      //SkipForward
+        //SkipForward
         private void btn_SkipForwardButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] { });
+            this.Dispatcher.Invoke(new Action(() => _mainController.SkipForwardButtonPressed()), new object[] {});
         }
 
-      //FastForward
+        //FastForward
         private void btn_FastForwardButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.FastForwardButtonPressed()), new object[] { });
+            this.Dispatcher.Invoke(new Action(() => _mainController.FastForwardButtonPressed()), new object[] {});
         }
 
-      //Shuffle
+        //Shuffle
         private void toggleShuffle(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(new Action(() => _mainController.ShuffleToggled()), new object[] { });
+            Dispatcher.Invoke(new Action(() => _mainController.ShuffleToggled()), new object[] {});
         }
 
-      //Repeat
+        //Repeat
         private void toggleRepeat(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(new Action(() => _mainController.RepeatToggled()), new object[] { });
+            Dispatcher.Invoke(new Action(() => _mainController.RepeatToggled()), new object[] {});
         }
 
-      //ScrubBar
+        //ScrubBar
         private void slider_ScrubBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)), new object[] { });
+            Dispatcher.Invoke(new Action(() => _mainController.ProgressBarMovedByUser(slider_ScrubBar.Value)),
+                new object[] {});
         }
 
-      //Volume
+        //Volume
         private void slider_VolumeControl_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.VolumeSliderChanged(this.slider_VolumeControl.Value)), new object[] { });
+            this.Dispatcher.Invoke(
+                new Action(() => _mainController.VolumeSliderChanged(this.slider_VolumeControl.Value)), new object[] {});
         }
 
-      //Hover Buttons
+        //Hover Buttons
         private void btnBehavior_MouseEnter(object sender, MouseEventArgs e)
         {
-            FrameworkElement element = (FrameworkElement)sender;
+            FrameworkElement element = (FrameworkElement) sender;
             element.Opacity = 0.75;
         }
 
         private void btnBehavior_MouseLeave(object sender, MouseEventArgs e)
         {
-            FrameworkElement element = (FrameworkElement)sender;
+            FrameworkElement element = (FrameworkElement) sender;
             element.Opacity = 0.25;
         }
-        
+
         private void btnBehavior_MouseDown(object sender, MouseEventArgs e)
         {
             FrameworkElement element = (FrameworkElement) sender;
             element.Opacity = 1.0;
         }
 
+       //
+        private void btnBehavior_ChangeImageSource(string buttonNameToSwitchTo)
+        {
+            if(buttonNameToSwitchTo == "PlayButton")
+            {
+                btn_PlayButton.Source = new BitmapImage(new Uri(@"./Images/PlayButton.png", UriKind.Relative));
+            }
+
+            else if(buttonNameToSwitchTo == "PauseButton")
+            {
+                btn_PlayButton.Source = new BitmapImage(new Uri(@"./Images/PauseButton.png", UriKind.Relative));
+            }
+        }
 
 
-    /******************************  WINDOW EVENTS  ******************************/
+
+        /******************************  WINDOW EVENTS  ******************************/
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             (new Thread(new ThreadStart(_mainController.Setup))).Start();
@@ -129,32 +146,30 @@ namespace MediaPlayer
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() => _mainController.CloseWindow()), new object[] { });
+            this.Dispatcher.Invoke(new Action(() => _mainController.CloseWindow()), new object[] {});
         }
 
 
-    /******************************  MEDIA EVENTS  ******************************/
+        /******************************  MEDIA EVENTS  ******************************/
+
         private void Me_MediaElement_OnMediaEnded(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(new Action(() => _mainController.MediaEnded()), new object[] { });
+            Dispatcher.Invoke(new Action(() => _mainController.MediaEnded()), new object[] {});
         }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            Console.WriteLine(e);
-        }
-
-
 
         private void RowImage_OnMouseLeave(object sender, MouseEventArgs e)
         {
-            DependencyObject obj = (DependencyObject)e.OriginalSource;
+            DependencyObject obj = (DependencyObject) e.OriginalSource;
 
             ListViewItem selectedItem = null;
             while (obj != null && obj != lv_MediaLibraryView)
             {
-                if (obj.GetType() == typeof(ListViewItem))
-                    Dispatcher.Invoke(new Action(() => _mainController.PlayListItemMouseLeave((Image)sender, ((ListViewItem)obj).DataContext)), new object[] { });
+                if (obj.GetType() == typeof (ListViewItem))
+                    Dispatcher.Invoke(
+                        new Action(
+                            () =>
+                                _mainController.PlayListItemMouseLeave((Image) sender, ((ListViewItem) obj).DataContext)),
+                        new object[] {});
 
                 obj = VisualTreeHelper.GetParent(obj);
             }
@@ -162,28 +177,34 @@ namespace MediaPlayer
 
         private void RowImage_OnMouseEnter(object sender, MouseEventArgs e)
         {
-            DependencyObject obj = (DependencyObject)e.OriginalSource;
+            DependencyObject obj = (DependencyObject) e.OriginalSource;
 
             Image sourceImage = null;
             ListViewItem selectedItem = null;
             while (obj != null && obj != lv_MediaLibraryView)
             {
 
-                if (obj.GetType() == typeof(ListViewItem))
-                    Dispatcher.Invoke(new Action(() => _mainController.PlayListItemMouseEnter((Image)sender, ((ListViewItem)obj).DataContext)), new object[] { });
+                if (obj.GetType() == typeof (ListViewItem))
+                    Dispatcher.Invoke(
+                        new Action(
+                            () =>
+                                _mainController.PlayListItemMouseEnter((Image) sender, ((ListViewItem) obj).DataContext)),
+                        new object[] {});
                 obj = VisualTreeHelper.GetParent(obj);
             }
         }
 
         private void RowImage_OnMouseUp(object sender, MouseButtonEventArgs e)
         {
-            DependencyObject obj = (DependencyObject)e.OriginalSource;
+            DependencyObject obj = (DependencyObject) e.OriginalSource;
 
             while (obj != null && obj != lv_MediaLibraryView)
             {
-                if (obj.GetType() == typeof(ListViewItem))
+                if (obj.GetType() == typeof (ListViewItem))
                 {
-                    Dispatcher.Invoke(new Action(() => _mainController.PlaylistItemClicked(((ListViewItem)obj).DataContext)), new object[] { });
+                    Dispatcher.Invoke(
+                        new Action(() => _mainController.PlaylistItemClicked(((ListViewItem) obj).DataContext)),
+                        new object[] {});
                     break;
                 }
                 obj = VisualTreeHelper.GetParent(obj);
@@ -191,16 +212,100 @@ namespace MediaPlayer
         }
 
         /******************************  INFORMATION EVENTS  ******************************/
+
         private void HelpBox(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Bynars Media Player" + Environment.NewLine
                             + "Version 1.0" + Environment.NewLine
                             + "by: Micheal Peterson, Travis Heppner, Lexi Guches" + Environment.NewLine
-                            + "To use soft ware go to the library tab and add media to the playlist." + Environment.NewLine
+                            + "To use soft ware go to the library tab and add media to the playlist." +
+                            Environment.NewLine
                             + "Then hit the play button in order to start the media playlist. " + Environment.NewLine
                             + "The next button will go to the next media, while the previous will" + Environment.NewLine
-                            + "go to the previous media.  There is also two sliders to control the" + Environment.NewLine
+                            + "go to the previous media.  There is also two sliders to control the" +
+                            Environment.NewLine
                             + "position of the media, and the volume of playback.");
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            IList selectedItems = lv_MediaLibraryView.SelectedItems;
+            Dispatcher.Invoke(new Action(() => _mainController.ContextMenuHeaderClicked((string) ((MenuItem) sender).Header, selectedItems)), new object[] {});
+        }
+
+        private void ContextMenu_CreatePlaylistButton_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.ContextMenuCreatePlaylist(newPLaylistNameTextbox.Text)), new object[] {});
+           // contextMenu.IsOpen = false;
+        }
+
+        private void ContextMenu_Playlist_Click(object sender, RoutedEventArgs e)
+        {
+            IList selectedItems = lv_MediaLibraryView.SelectedItems;
+            Dispatcher.Invoke(new Action(() => _mainController.ContextMenuPlaylistClicked((string)((MenuItem)sender).Header, selectedItems)), new object[] { });
+        }
+
+        public void UpdateContextMenu(List<string> playlistNames, bool showAddNewMedia)
+        {
+            if(showAddNewMedia)
+                this.contextMenu_MediaItem_AddNewMedia.IsEnabled = true;
+            else
+                this.contextMenu_MediaItem_AddNewMedia.IsEnabled = false;
+
+            if (playlistNames != null && playlistNames.Any())
+            {
+                contextMenu_StackPanel_Playlists.Children.Clear();
+                foreach (string thisPlaylist in playlistNames)
+                {
+                    if (!string.IsNullOrEmpty(thisPlaylist))
+                    {
+                        MenuItem thisItem = new MenuItem() {Header = thisPlaylist};
+                        thisItem.Click += new RoutedEventHandler(ContextMenu_Playlist_Click);
+                        contextMenu_StackPanel_Playlists.Children.Add(thisItem);
+                    }
+                }
+            }
+
+        }
+
+        private void PlaylistDelete_Clicked(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            while (obj != null && obj != lv_MediaLibraryView)
+            {
+                if (obj.GetType() == typeof(ListViewItem))
+                {
+                    try
+                    {
+                        ListViewItem thisItem = (ListViewItem)obj;
+                        string playListName = ((PlaylistViewRow)thisItem.DataContext).Name;
+
+                        Dispatcher.Invoke(
+                            new Action(() => _mainController.PlaylistDeleteClicked(playListName)),
+                            new object[] { });
+                        break;
+
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+        }
+
+        private void ListView_PlayList_CLicked(object sender, MouseButtonEventArgs e)
+        {
+            ListViewItem thisItem = (ListViewItem) sender;
+            try
+            {
+                string selectedPlaylistName = ((PlaylistViewRow)thisItem.DataContext).Name;
+                Dispatcher.Invoke(new Action(() => _mainController.PlaylistSelected(selectedPlaylistName)), new object[] { });
+             }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }

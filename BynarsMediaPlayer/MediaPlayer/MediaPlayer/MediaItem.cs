@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -75,12 +76,32 @@ namespace MediaPlayer
             if(string.IsNullOrEmpty(Filepath) || (obj.GetType() != this.GetType()))
                 return false;
 
+            MediaItem that = (MediaItem) obj;
+            if (String.IsNullOrEmpty(that.Filepath))
+                return false;
             return Filepath.Equals(((MediaItem)obj).Filepath);
         }
 
         public override string ToString()
         {
             return (string.IsNullOrEmpty(Filepath)) ? "" : Filepath.ToString();
+        }
+
+        public MediaItem Clone()
+        {
+            return new MediaItem(Filepath)
+            {
+                Album = Album,
+                Title = Title,
+                Year = Year,
+                Artist = Artist,
+                Genre = Genre,
+                Duration = Duration, 
+                Filetype =  Filetype,
+                Filepath = Filepath,
+                IsPlaying = false,
+                Position = 0.0
+            };
         }
     }
 }

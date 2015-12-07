@@ -1,22 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Timers;
 using Timer = System.Timers.Timer;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace MediaPlayer
 {
     [DataContract]
-    class MainController
+    public class MainController
     {
         private MainWindow _view;
         [DataMember]
@@ -40,7 +43,7 @@ namespace MediaPlayer
         private Thread _fileScannerThread;
         private List<string> _supportedExtentions;
 
-        private MediaLibrary _mediaLibrary;
+
         private bool _timerIsChangingScrubBar;
         [DataMember]
         private string _stateCaptureFileName;
@@ -51,9 +54,13 @@ namespace MediaPlayer
         // This variable is used to change the position of the media, it will be changed when the timer gets triggered
         private double _requestedPositionValue;
         // private List<string> _selectedLibraryFiles;
-         
-        public List<string> SupportedExtentions { get { return _supportedExtentions; } } 
-
+        private double _playSpeed = 1;
+        public List<string> SupportedExtentions { get { return _supportedExtentions; } }
+        private List<string> _playlistNames { get; set; }
+        private List<MediaLibrary> _playlists { get; set; }
+        private MediaLibrary _modifiedPlaylist;
+        private MediaLibrary _mediaLibrary;
+        private MediaLibrary _currentPlaylist;
         public MainController(MainWindow view)
         {
             _view =  view;
@@ -63,6 +70,12 @@ namespace MediaPlayer
             _playMode = PlayModeEnum.Consecutive;
             _timerIsChangingScrubBar = false;
             _currentItem = new MediaItem();
+            _playlistNames = new List<string>();
+            _currentPlaylistName = "";
+            _currentPlaylist = new MediaLibrary("", this);
+            _playlists = new List<MediaLibrary>();
+            _mediaElementPollingTimer = new Timer(150);
+            _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
         }
 
         public bool LoadSavedState()
@@ -76,7 +89,12 @@ namespace MediaPlayer
                 _playMode = lastInstance._playMode;
                 _volume = lastInstance._volume;
                 _currentPlaylistName = lastInstance._currentPlaylistName;
-                _currentItem = new MediaItem();
+                if (_currentPlaylistName == "")
+                    _currentPlaylistName = "Media Library";
+                _currentPlaylist = GetPlaylistByName(_currentPlaylistName);
+                SetCurrentPlaylist(_currentPlaylistName);   
+                UpdateCurrentPlaylistTab();
+
             }
             catch (Exception e)
             {
@@ -91,6 +109,7 @@ namespace MediaPlayer
             _playMode = PlayModeEnum.Consecutive;
             _volume = 0.5;
             _currentPlaylistName = "Media Library";
+            _currentPlaylist = _mediaLibrary;
         }
 
 
@@ -107,28 +126,137 @@ namespace MediaPlayer
             _databaseController = new DatabaseController();
             _mediaLibrary.AddRange(_databaseController.GetMediaItemsFromDatabase());
 
+            // Get the playlist names
+            List<string> playlistNames = _databaseController.getPlaylists();
+            if(playlistNames != null && playlistNames.Any() )
+                _playlistNames.AddRange(playlistNames);
+
+            //populate the playlists
+            foreach (string thisPlaylistName in _playlistNames)
+            {
+                try
+                {
+                    List<MediaItem> thisList = _databaseController.retrievePlaylist(thisPlaylistName);
+                    if (thisList != null)
+                    {
+                        MediaLibrary thisPlaylist = new MediaLibrary(thisPlaylistName, this);
+                        thisPlaylist.Deletable = true;
+                        thisPlaylist.AddRange(thisList);
+                        _playlists.Add(thisPlaylist);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
+            }
+            
             // If there are no entries in the media library, kick off a thread to scan the filesystem for media, 
             // and add that to the library.
             if (!_mediaLibrary.Any())
             {
                 _fileScanner = new FileScanner(this);
                 _fileScannerThread = new Thread(new ParameterizedThreadStart(_fileScanner.ScanDirectory));
-                _fileScannerThread.Start("C:\\");
+                _fileScannerThread.Start("C:\\users\\" + Environment.UserName);
             }
 
+            //_view.Dispatcher.Invoke(new Action(() => UpdateView()), new object[] { });
             UpdateDataGrids();
-        
-            // Start the polling timer (which is used to update the view)
-            _mediaElementPollingTimer = new Timer(150);
-            _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
+            UpdateContextMenu();
+             // Start the polling timer (which is used to update the view)
             _mediaElementPollingTimer.Start();
 
-            _view.Dispatcher.Invoke(new Action(() => this.UpdatePlayButtonImage()), new object[] { });
+        }
+
+        private void SetCurrentPlaylist(string playlistName)
+        {
+            if (String.IsNullOrEmpty(playlistName))
+                return;
+            _mediaElementPollingTimer.Enabled = false;
+
+            if (playlistName == "Media Library" || !_playlistNames.Contains(playlistName))
+            {
+                _currentPlaylist = _mediaLibrary;
+                _currentPlaylistName = "Media Library";
+            }
+            else
+            {
+                foreach (MediaLibrary thisPlaylist in _playlists)
+                    if (thisPlaylist.Name == playlistName)
+                    {
+                        _currentPlaylist = thisPlaylist;
+                        _currentPlaylistName = playlistName;
+                    }
+            }
+            UpdateCurrentPlaylistTab();
+            ChangeCurrentMedia(_currentPlaylist.GetCurrentMedia());
+            _mediaElementPollingTimer.Enabled = true;
+        }
+
+        private bool CreatePlaylist(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName) || _playlistNames.Contains(playlistName) || playlistName == "MediaLibary")
+                return false;
+
+            try
+            {
+                _databaseController.addPlayList(playlistName);
+                _playlistNames.Add(playlistName);
+                _playlists.Add(new MediaLibrary(playlistName,this) {Deletable = true});
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+       }
+
+
+        public void UpdateCurrentPlaylistTab()
+        {
+            _view.Dispatcher.Invoke(new Action(() => _view.TabItem_CurrentPlaylist.Header = _currentPlaylistName), new object[] { });
+            UpdateDataGrids();
         }
 
         public void UpdateDataGrids()
         {
-            _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
+            _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _currentPlaylist.GetMedia()), new object[] { });
+            _view.Dispatcher.Invoke(new Action(UpdatePlaylistsTab), new object[] { });
+        }
+
+        public void UpdatePlaylistsTab()
+        {
+            _view.lv_Playlists.Items.Clear();
+            _view.lv_Playlists.Items.Add(new PlaylistViewRow() {Name = "Media Library", Deletable = false});
+
+            foreach (string thisPlaylist in _playlistNames)
+                _view.lv_Playlists.Items.Add(new PlaylistViewRow() {Name = thisPlaylist, Deletable = true});
+        }
+
+
+        public void UpdateContextMenu()
+        {
+            bool inMediaLibrary = (_currentPlaylistName == "Media Library") ? true : false;
+            _view.Dispatcher.Invoke(new Action(() => _view.UpdateContextMenu(_playlistNames, inMediaLibrary)), new object[] { });
+        }
+
+        public void UpdatePlayModeButtons()
+        {
+            switch (_playMode)
+            {
+                case PlayModeEnum.Consecutive:
+                    _view.btn_ShuffleButton.Source = new BitmapImage(new Uri(@"Images\ShuffleButton.png", UriKind.Relative));
+                    _view.btn_RepeatButton.Source = new BitmapImage(new Uri(@"images\RepeatButton.png", UriKind.Relative));
+                    break;
+                case PlayModeEnum.Repeat:
+                    _view.btn_ShuffleButton.Source = new BitmapImage(new Uri(@"Images\ShuffleButton.png", UriKind.Relative));
+                    _view.btn_RepeatButton.Source = new BitmapImage(new Uri(@"Images\RepeatButtonActive.png", UriKind.Relative));
+                    break;
+                case PlayModeEnum.Shuffle:
+                    _view.btn_ShuffleButton.Source = new BitmapImage(new Uri(@"Images\ShuffleButtonActive.png", UriKind.Relative));
+                    _view.btn_RepeatButton.Source =  new BitmapImage(new Uri(@"Images\RepeatButton.png", UriKind.Relative));
+                    break;
+            }
         }
 
         private void CheckForPositionChangeRequest()
@@ -149,6 +277,48 @@ namespace MediaPlayer
                 _timerIsChangingScrubBar = false;
             }
         }
+
+        public bool AddMediaToPlaylist(string playlistName, List<MediaItem> mediaItems )
+        {
+            if (String.IsNullOrEmpty(playlistName) || !_playlistNames.Contains(playlistName) || mediaItems == null || !mediaItems.Any())
+                return false;
+
+            MediaLibrary thisPlaylist = GetPlaylistByName(playlistName);
+            if (thisPlaylist.Name == "")
+                return false;
+
+            thisPlaylist.AddRange(mediaItems);
+
+            return true;
+        }
+        public bool RemoveMediaFromPlaylist(string playlistName, List<MediaItem> mediaItems)
+        {
+            if (String.IsNullOrEmpty(playlistName) || (!_playlistNames.Contains(playlistName) && playlistName != "Media Library") || mediaItems == null || !mediaItems.Any())
+                return false;
+
+            MediaLibrary thisPlaylist = GetPlaylistByName(playlistName);
+            if (thisPlaylist.Name == "")
+                return false;
+
+            foreach (MediaItem thisItem in mediaItems)
+                thisPlaylist.RemoveItem(thisItem);
+
+            return true;
+        }
+
+        public MediaLibrary GetPlaylistByName(string playlistName)
+        {
+            if (String.IsNullOrEmpty(playlistName) || !_playlistNames.Contains(playlistName))
+                return new MediaLibrary("", this); // return a null object, we should never neeed this
+
+            foreach (MediaLibrary thisPlaylist in _playlists)
+                if (thisPlaylist.Name == playlistName)
+                    return thisPlaylist;
+
+            return new MediaLibrary("", this); // return a null object, we should never neeed this
+
+        }
+
         
         public void UpdateView()
         {
@@ -163,24 +333,8 @@ namespace MediaPlayer
                 // Update Progress Slider
                 double completionRatio = timeElapsed.TotalMilliseconds/totalTime.TotalMilliseconds;
                 _view.slider_ScrubBar.Value = completionRatio;
-                _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _mediaLibrary.GetMedia()), new object[] { });
+                UpdateDataGrids();
                 _currentItem.Position = completionRatio;
-
-                // update the play mode toggle
-                _view.btn_PlayButton.ApplyTemplate();
-
-                switch (_playMode)
-                {
-                    case PlayModeEnum.Consecutive:
-                        _view.BTN_playMode.Content = "C";
-                        break;
-                    case PlayModeEnum.Repeat:
-                        _view.BTN_playMode.Content = "R";
-                        break;
-                    case PlayModeEnum.Shuffle:
-                        _view.BTN_playMode.Content = "S";
-                        break;
-                }
             }
             else
             {
@@ -191,10 +345,22 @@ namespace MediaPlayer
             //Update the Volume Slider
             _view.slider_VolumeControl.Value = _volume;
 
+            // Update the play/pause button image
+            UpdatePlayButtonImage();
+
+            // Update the play mode buttons
+            UpdatePlayModeButtons();
+
         }
 
 
-        public void DeleteLibraryEntry() { }
+
+        public void DeleteLibraryEntry(MediaItem thisMedia)
+        {
+            if (thisMedia == null)
+                return;
+            RemoveMediaFromPlaylist("Media Library", new List<MediaItem>( new MediaItem[] {thisMedia}) );
+        }
 
         // This method is called by the FileScanner 
         // (or possibly another piece of code) when a new file needs to be added to the library
@@ -211,6 +377,28 @@ namespace MediaPlayer
             }
         }
 
+        public void RemovePlaylist(string playlistName)
+        {
+            if (String.IsNullOrEmpty(playlistName) || playlistName == "Media Library" || !_playlistNames.Contains(playlistName))
+                return;
+
+            _playlistNames.Remove(playlistName);
+
+            _playlists.Remove(GetPlaylistByName(playlistName));
+
+            if(_currentPlaylistName == playlistName)
+                SetCurrentPlaylist("Media Library");
+
+            try
+            {
+                _databaseController.removePlaylist(playlistName);
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+
         public void FetchMediaLibraryData() { }
 
         public bool ChangeCurrentMedia(MediaItem _newItem)
@@ -220,9 +408,9 @@ namespace MediaPlayer
                 return false;
             try
             {
-                if (!_mediaLibrary.SetCurrentMedia(_newItem))
+                if (!_currentPlaylist.SetCurrentMedia(_newItem))
                     return false;
-                _currentItem = _mediaLibrary.GetCurrentMedia();
+                _currentItem = _currentPlaylist.GetCurrentMedia();
                 _mediaElement.Source = new Uri(_currentItem.Filepath);
 
                 _requestedPositionValue = _currentItem.Position;
@@ -234,7 +422,7 @@ namespace MediaPlayer
             {
                 return false;
             }
-            this._currentItem = _mediaLibrary.GetCurrentMedia();
+            this._currentItem = _currentPlaylist.GetCurrentMedia();
             _mediaElementPollingTimer.Enabled = true;
             return true;
         }
@@ -277,12 +465,12 @@ namespace MediaPlayer
 
         public void RewindButtonPressed()
         {
-            Console.WriteLine("Rewind");
+            PlaySpeedCycle("Slower");
         }
 
         public void SkipBackwardButtonPressed()
         {
-            ChangeCurrentMedia(_mediaLibrary.GetPreviousSong());
+            ChangeCurrentMedia(_currentPlaylist.GetPreviousSong());
         }
 
         public void StopButtonPressed()
@@ -295,41 +483,106 @@ namespace MediaPlayer
         public void SkipForwardButtonPressed()
         {
             Console.WriteLine("Skip Forward");
-            ChangeCurrentMedia(_mediaLibrary.GetNextSong());
+            ChangeCurrentMedia(_currentPlaylist.GetNextSong());
         }
 
         public void FastForwardButtonPressed()
         {
-            Console.WriteLine("Fast-Forward");
+            PlaySpeedCycle("Faster");
         }
 
         public void ShuffleToggled()
         {
             if (_playMode == PlayModeEnum.Consecutive || _playMode == PlayModeEnum.Repeat)
-            {
                 _playMode = PlayModeEnum.Shuffle;
-                _view.BTN_playMode.Content = "S";
-            }
-
             else
-            {
                 _playMode = PlayModeEnum.Consecutive;
-                _view.BTN_playMode.Content = "C";
-            }
+
+            UpdatePlayModeButtons();
         }
 
         public void RepeatToggled()
         {
             if (_playMode == PlayModeEnum.Consecutive || _playMode == PlayModeEnum.Shuffle)
-            {
                 _playMode = PlayModeEnum.Repeat;
-                _view.BTN_playMode.Content = "R";
+            else
+                _playMode = PlayModeEnum.Consecutive;
+
+            UpdatePlayModeButtons();
+        }
+
+        public void PlaySpeedCycle(string speed)
+        {
+            if (_playSpeed == .25 && speed == "Faster")
+            {
+                _playSpeed = .5;
+                _mediaElement.SpeedRatio = _playSpeed;
             }
 
-            else
+            else if (_playSpeed == .5)
             {
-                _playMode = PlayModeEnum.Consecutive;
-                _view.BTN_playMode.Content = "C";
+                if (speed == "Slower")
+                    _playSpeed = .25;
+                else
+                    _playSpeed = .75;
+
+                _mediaElement.SpeedRatio = _playSpeed;
+            }
+
+            else if (_playSpeed == .75)
+            {
+                if (speed == "Slower")
+                    _playSpeed = .5;
+                else
+                    _playSpeed = 1;
+
+                _mediaElement.SpeedRatio = _playSpeed;
+            }
+
+            else if (_playSpeed == 1)
+            {
+                if (speed == "Slower")
+                    _playSpeed = .75;
+                else
+                    _playSpeed = 1.25;
+
+                _mediaElement.SpeedRatio = _playSpeed;
+            }
+
+            else if (_playSpeed == 1.25)
+            {
+                if (speed == "Slower")
+                    _playSpeed = 1;
+                else
+                    _playSpeed = 1.5;
+
+                _mediaElement.SpeedRatio = _playSpeed;
+            }
+
+            else if (_playSpeed == 1.5)
+            {
+                if (speed == "Slower")
+                    _playSpeed = 1.25;
+                else
+                    _playSpeed = 1.75;
+
+                _mediaElement.SpeedRatio = _playSpeed;
+            }
+
+            else if (_playSpeed == 1.75)
+            {
+                if (speed == "Slower")
+                    _playSpeed = 1.5;
+                else
+                    _playSpeed = 2;
+
+                _mediaElement.SpeedRatio = _playSpeed;
+            }
+
+            else if (_playSpeed == 2 && speed == "Slower")
+            {
+                _playSpeed = 1.75;
+                _mediaElement.SpeedRatio = _playSpeed;
             }
         }
 
@@ -349,7 +602,7 @@ namespace MediaPlayer
             if (item.GetType() == typeof(MediaItem))
             {
                 MediaItem thisItem = (MediaItem)item;
-                if (!_currentItem.Equals(thisItem))
+                if (_currentItem == null || !_currentItem.Equals(thisItem))
                     ((Image)image).Source = new BitmapImage(new Uri(@"Images\PlayFromListInActive.png", UriKind.Relative));
             }
 
@@ -365,21 +618,100 @@ namespace MediaPlayer
                 ChangeCurrentMedia(clickedItem);
             }
         }
+
+        public void PlaylistDeleteClicked(string playlistName)
+        {
+            MediaLibrary clickedItem = GetPlaylistByName(playlistName);      
+            if (_currentPlaylistName == playlistName)
+                SetCurrentPlaylist("MediaLibrary");
+            RemovePlaylist(clickedItem.Name);
+            UpdateDataGrids();    
+        }
+
+        public void PlaylistSelected(string playlistName)
+        {
+            if(!String.IsNullOrEmpty(playlistName))
+                SetCurrentPlaylist(playlistName);
+        }
+
         public void PlayListItemMouseEnter(object image, object item)
         {
             if (item.GetType() == typeof(MediaItem))
             {
                 MediaItem thisItem = (MediaItem)item;
-                if (!_currentItem.Equals(thisItem))
+                if (_currentItem == null || !_currentItem.Equals(thisItem))
                     ((Image)image).Source = new BitmapImage(new Uri(@"Images\PlayFromList.png", UriKind.Relative));
             }
         }
+
+        public void ContextMenuHeaderClicked(string headerValue, IList selectedItems)
+        {
+            List<MediaItem> newItems = new List<MediaItem>();
+            foreach (object thisItem in selectedItems)
+                newItems.Add((MediaItem)thisItem);
+
+
+            if (String.IsNullOrEmpty(headerValue))
+                return;
+            switch (headerValue)
+            {
+                case "Delete Selection":
+                    RemoveMediaFromPlaylist(_currentPlaylistName, newItems);
+                    UpdateDataGrids();
+                    break;
+                case "Add Selection to Playlist":
+                    AddMediaToPlaylist(_currentPlaylistName, newItems);
+                    UpdateDataGrids();
+                    break;
+                case "Add Files":
+                    // TODO: wirte a method that gets files from a dialog, 
+                    //       get mediaItems from those files, then put those files into the current playlist
+                    UpdateDataGrids();
+                    break;
+                case "Add Files In Directory":
+                    // TODO: write a method that gets a directory, use the scanner to find all the matching files
+                    //       in that directory, create mediaItems from those files, then put those MediaItems into the current playlist.
+                    UpdateDataGrids();
+                    break;
+                case "Add Files In Directory (Include Subdirectories":
+                    // TODO: Same as previous, but search recursivly through the directories.
+                    break;
+            }
+
+            Console.WriteLine(headerValue);
+        }
+
+        public void ContextMenuCreatePlaylist(string playlistName)
+        {
+            CreatePlaylist(playlistName);
+            UpdateContextMenu();
+
+            Console.WriteLine(playlistName);
+        }
+        public void ContextMenuPlaylistClicked(string playlistName, IList selectedItems)
+        {
+            List<MediaItem> newItems = new List<MediaItem>();
+            foreach(object thisItem in selectedItems)
+                newItems.Add((MediaItem)thisItem);
+
+            AddMediaToPlaylist(playlistName, newItems);
+            Console.WriteLine(playlistName);
+        }
+
+
 
         /******************************  WINDOW EVENTS  ******************************/
         public void CloseWindow()
         {
             Utilities.SerializeObjectToJson<MainController>(_stateCaptureFileName, this);
             _databaseController.AddMediaItemsToDatabase(_mediaLibrary.GetMedia());
+
+            foreach (string thisPlaylistName in _playlistNames)
+            {
+                MediaLibrary thisPlaylist = GetPlaylistByName(thisPlaylistName);
+                _databaseController.AddMediaItemsToDatabase(thisPlaylistName, thisPlaylist.GetMedia());
+            }
+            
             if (_fileScannerThread != null && _fileScannerThread.IsAlive)
                 _fileScannerThread.Abort();
             _mediaElementPollingTimer.Stop();
@@ -393,7 +725,7 @@ namespace MediaPlayer
             if (_currentItem != null)
                 _currentItem.Position = 0.0;
 
-            ChangeCurrentMedia(_mediaLibrary.GetNextSong());
+            ChangeCurrentMedia(_currentPlaylist.GetNextSong());
         }
 
         public void PlaylistItemDoubleClicked(ListViewItem item)
