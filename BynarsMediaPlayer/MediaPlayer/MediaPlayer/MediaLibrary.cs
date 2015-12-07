@@ -6,18 +6,20 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MediaPlayer
 {
-    class MediaLibrary
+    public  class MediaLibrary
     {
         private string _name;
         private HashSet<MediaItem> _library;
         private LinkedList<MediaItem> _reverseLibrary; 
         private MainController _mainController;
         private MediaItem _currentItem;
-        private IEnumerator<MediaItem> _itemPointer; 
-
+        private IEnumerator<MediaItem> _itemPointer;
+        private bool _deletable ;
+        
         public MediaLibrary(string name, MainController mainController)
         {
             _name = (string.IsNullOrEmpty(name)) ? "" : name;
@@ -26,11 +28,18 @@ namespace MediaPlayer
             _itemPointer = _library.GetEnumerator();
             _reverseLibrary = new LinkedList<MediaItem>();
             _currentItem = new MediaItem();
+            _deletable = false;
         }
 
         public string Name
         {
             get { return _name; }
+        }
+
+        public bool Deletable
+        {
+            get { return _deletable; }
+            set { _deletable = value; }
         }
 
         public int AddNewMediaItem(MediaItem item)

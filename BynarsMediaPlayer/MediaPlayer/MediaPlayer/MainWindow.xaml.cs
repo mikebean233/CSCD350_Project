@@ -229,18 +229,20 @@ namespace MediaPlayer
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(new Action(() => _mainController.ContextMenuHeaderClicked((string) ((MenuItem) sender).Header)), new object[] {});
+            IList selectedItems = lv_MediaLibraryView.SelectedItems;
+            Dispatcher.Invoke(new Action(() => _mainController.ContextMenuHeaderClicked((string) ((MenuItem) sender).Header, selectedItems)), new object[] {});
         }
 
         private void ContextMenu_CreatePlaylistButton_Click(object sender, RoutedEventArgs e)
         {
             Dispatcher.Invoke(new Action(() => _mainController.ContextMenuCreatePlaylist(newPLaylistNameTextbox.Text)), new object[] {});
-            contextMenu.IsOpen = false;
+           // contextMenu.IsOpen = false;
         }
 
         private void ContextMenu_Playlist_Click(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(new Action(() => _mainController.ContextMenuHeaderClicked((string)((MenuItem)sender).Header)), new object[] { });
+            IList selectedItems = lv_MediaLibraryView.SelectedItems;
+            Dispatcher.Invoke(new Action(() => _mainController.ContextMenuPlaylistClicked((string)((MenuItem)sender).Header, selectedItems)), new object[] { });
         }
 
         public void UpdateContextMenu(List<string> playlistNames, bool showAddNewMedia)
@@ -264,6 +266,46 @@ namespace MediaPlayer
                 }
             }
 
+        }
+
+        private void PlaylistDelete_Clicked(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            while (obj != null && obj != lv_MediaLibraryView)
+            {
+                if (obj.GetType() == typeof(ListViewItem))
+                {
+                    try
+                    {
+                        ListViewItem thisItem = (ListViewItem)obj;
+                        string playListName = ((PlaylistViewRow)thisItem.DataContext).Name;
+
+                        Dispatcher.Invoke(
+                            new Action(() => _mainController.PlaylistDeleteClicked(playListName)),
+                            new object[] { });
+                        break;
+
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+        }
+
+        private void ListView_PlayList_CLicked(object sender, MouseButtonEventArgs e)
+        {
+            ListViewItem thisItem = (ListViewItem) sender;
+            try
+            {
+                string selectedPlaylistName = ((PlaylistViewRow)thisItem.DataContext).Name;
+                Dispatcher.Invoke(new Action(() => _mainController.PlaylistSelected(selectedPlaylistName)), new object[] { });
+             }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }
