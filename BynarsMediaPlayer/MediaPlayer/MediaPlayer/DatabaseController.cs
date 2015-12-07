@@ -220,7 +220,7 @@ namespace MediaPlayer
             List<MediaItem> items = new List<MediaItem>();
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                sqlCommand.CommandText = "SELECT " + tableName + " FROM library";
+                sqlCommand.CommandText = "SELECT * FROM " + tableName;
                 using (SQLiteDataReader reader = sqlCommand.ExecuteReader())
                 {
                     try
@@ -383,9 +383,12 @@ namespace MediaPlayer
                 sqlCommand.CommandText = "SELECT tableName FROM Playlists WHERE playlist = @playlist";
                 sqlCommand.Parameters.Add("@playlist", DbType.String).Value = playListName;
                 SQLiteDataReader sqlReader = sqlCommand.ExecuteReader();
-                tableName = sqlReader.GetString(0);
-                sqlReader.Close();
 
+                if (sqlReader.Read())
+                    tableName = (string )sqlReader["tablename"];
+                else
+                    throw new Exception("DatabaseController.getTableName() found no entries for the playlist " + playListName);
+                sqlReader.Close();
             }
             return tableName;
 
