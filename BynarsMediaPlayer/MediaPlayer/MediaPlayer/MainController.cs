@@ -57,23 +57,24 @@ namespace MediaPlayer
         private double _playSpeed = 1;
         public List<string> SupportedExtentions { get { return _supportedExtentions; } }
         private List<string> _playlistNames { get; set; }
-        private List<MediaLibrary> _playlists { get; set; }
-        private MediaLibrary _modifiedPlaylist;
-        private MediaLibrary _mediaLibrary;
-        private MediaLibrary _currentPlaylist;
+        private List<MediaList> _playlists { get; set; }
+        private MediaList _modifiedPlaylist;
+        private MediaList _mediaLibrary;
+
+        private MediaList _currentPlaylist;
         public MainController(MainWindow view)
         {
             _view =  view;
             _supportedExtentions = new List<string>() {"*mp3", "*wma", "*wmv", "*asf"};
-            _mediaLibrary = new MediaLibrary("Media Library", this);
+            _mediaLibrary = new MediaList("Media Library", this);
             _stateCaptureFileName = "savedState.cfg";
             _playMode = PlayModeEnum.Consecutive;
             _timerIsChangingScrubBar = false;
             _currentItem = new MediaItem();
             _playlistNames = new List<string>();
             _currentPlaylistName = "";
-            _currentPlaylist = new MediaLibrary("", this);
-            _playlists = new List<MediaLibrary>();
+            _currentPlaylist = new MediaList("", this);
+            _playlists = new List<MediaList>();
             _mediaElementPollingTimer = new Timer(150);
             _mediaElementPollingTimer.Elapsed += new ElapsedEventHandler(PollingTimerHandler);
         }
@@ -136,7 +137,7 @@ namespace MediaPlayer
                     List<MediaItem> thisList = _databaseController.retrievePlaylist(thisPlaylistName);
                     if (thisList != null)
                     {
-                        MediaLibrary thisPlaylist = new MediaLibrary(thisPlaylistName, this);
+                        MediaList thisPlaylist = new MediaList(thisPlaylistName, this);
                         thisPlaylist.Deletable = true;
                         thisPlaylist.AddRange(thisList);
                         _playlists.Add(thisPlaylist);
@@ -179,6 +180,19 @@ namespace MediaPlayer
                 return;
             _mediaElementPollingTimer.Enabled = false;
 
+
+            // Check to see if we are showing results of a search or sort, this is done by seeing if _modifiedPlaylist is null
+            if (_modifiedPlaylist != null)
+            {
+                UpdateCurrentPlaylistTab();
+                UpdateDataGrids();
+                ChangeCurrentMedia(_modifiedPlaylist.GetCurrentMedia());
+                _mediaElementPollingTimer.Enabled = true;
+                return;
+            }
+
+
+            // Check to see if we are changing back to he Media Library
             if (playlistName == "Media Library" || !_playlistNames.Contains(playlistName))
             {
                 _currentPlaylist = _mediaLibrary;
@@ -186,13 +200,14 @@ namespace MediaPlayer
             }
             else
             {
-                foreach (MediaLibrary thisPlaylist in _playlists)
+                foreach (MediaList thisPlaylist in _playlists)
                     if (thisPlaylist.Name == playlistName)
                     {
                         _currentPlaylist = thisPlaylist;
                         _currentPlaylistName = playlistName;
                     }
             }
+            UpdateDataGrids();
             UpdateCurrentPlaylistTab();
             ChangeCurrentMedia(_currentPlaylist.GetCurrentMedia());
             _mediaElementPollingTimer.Enabled = true;
@@ -207,7 +222,7 @@ namespace MediaPlayer
             {
                 _databaseController.addPlayList(playlistName);
                 _playlistNames.Add(playlistName);
-                _playlists.Add(new MediaLibrary(playlistName,this) {Deletable = true});
+                _playlists.Add(new MediaList(playlistName,this) {Deletable = true});
                 return true;
             }
             catch (Exception e)
@@ -225,7 +240,12 @@ namespace MediaPlayer
 
         public void UpdateDataGrids()
         {
-            _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = _currentPlaylist.GetMedia()), new object[] { });
+            List<MediaItem> gridItems;
+            if (_modifiedPlaylist == null)
+                gridItems = _currentPlaylist.GetMedia();
+            else
+                gridItems = _modifiedPlaylist.GetMedia();
+            _view.Dispatcher.Invoke(new Action(() => _view.lv_MediaLibraryView.ItemsSource = gridItems), new object[] { });
             _view.Dispatcher.Invoke(new Action(UpdatePlaylistsTab), new object[] { });
         }
 
@@ -288,7 +308,7 @@ namespace MediaPlayer
             if (String.IsNullOrEmpty(playlistName) || !_playlistNames.Contains(playlistName) || mediaItems == null || !mediaItems.Any())
                 return false;
 
-            MediaLibrary thisPlaylist = GetPlaylistByName(playlistName);
+            MediaList thisPlaylist = GetPlaylistByName(playlistName);
             if (thisPlaylist.Name == "")
                 return false;
 
@@ -301,7 +321,7 @@ namespace MediaPlayer
             if (String.IsNullOrEmpty(playlistName) || (!_playlistNames.Contains(playlistName) && playlistName != "Media Library") || mediaItems == null || !mediaItems.Any())
                 return false;
 
-            MediaLibrary thisPlaylist = GetPlaylistByName(playlistName);
+            MediaList thisPlaylist = GetPlaylistByName(playlistName);
             if (thisPlaylist.Name == "")
                 return false;
 
@@ -311,16 +331,16 @@ namespace MediaPlayer
             return true;
         }
 
-        public MediaLibrary GetPlaylistByName(string playlistName)
+        public MediaList GetPlaylistByName(string playlistName)
         {
             if (String.IsNullOrEmpty(playlistName) || !_playlistNames.Contains(playlistName))
-                return new MediaLibrary("", this); // return a null object, we should never neeed this
+                return new MediaList("", this); // return a null object, we should never neeed this
 
-            foreach (MediaLibrary thisPlaylist in _playlists)
+            foreach (MediaList thisPlaylist in _playlists)
                 if (thisPlaylist.Name == playlistName)
                     return thisPlaylist;
 
-            return new MediaLibrary("", this); // return a null object, we should never neeed this
+            return new MediaList("", this); // return a null object, we should never neeed this
 
         }
 
@@ -408,14 +428,16 @@ namespace MediaPlayer
 
         public bool ChangeCurrentMedia(MediaItem _newItem)
         {
+            MediaList displayedPlaylist = (_modifiedPlaylist == null) ? _currentPlaylist : _modifiedPlaylist;
+
             _mediaElementPollingTimer.Enabled = false;
             if (_newItem == null)
                 return false;
             try
             {
-                if (!_currentPlaylist.SetCurrentMedia(_newItem))
+                if (!displayedPlaylist.SetCurrentMedia(_newItem))
                     return false;
-                _currentItem = _currentPlaylist.GetCurrentMedia();
+                _currentItem = displayedPlaylist.GetCurrentMedia();
                 _mediaElement.Source = new Uri(_currentItem.Filepath);
 
                 _requestedPositionValue = _currentItem.Position;
@@ -438,7 +460,7 @@ namespace MediaPlayer
             {
                 return false;
             }
-            this._currentItem = _currentPlaylist.GetCurrentMedia();
+            this._currentItem = displayedPlaylist.GetCurrentMedia();
             _mediaElementPollingTimer.Enabled = true;
             return true;
         }
@@ -486,7 +508,8 @@ namespace MediaPlayer
 
         public void SkipBackwardButtonPressed()
         {
-            ChangeCurrentMedia(_currentPlaylist.GetPreviousSong());
+            MediaList displayedPlaylist = (_modifiedPlaylist == null) ? _currentPlaylist : _modifiedPlaylist;
+            ChangeCurrentMedia(displayedPlaylist.GetPreviousSong());
             UpdateDataGrids();
         }
 
@@ -499,7 +522,8 @@ namespace MediaPlayer
 
         public void SkipForwardButtonPressed()
         {
-            ChangeCurrentMedia(_currentPlaylist.GetNextSong());
+            MediaList displayedPlaylist = (_modifiedPlaylist == null) ? _currentPlaylist: _modifiedPlaylist;
+            ChangeCurrentMedia(displayedPlaylist.GetNextSong());
             UpdateDataGrids();
         }
 
@@ -639,7 +663,7 @@ namespace MediaPlayer
 
         public void PlaylistDeleteClicked(string playlistName)
         {
-            MediaLibrary clickedItem = GetPlaylistByName(playlistName);      
+            MediaList clickedItem = GetPlaylistByName(playlistName);      
             if (_currentPlaylistName == playlistName)
                 SetCurrentPlaylist("MediaLibrary");
             RemovePlaylist(clickedItem.Name);
@@ -662,6 +686,32 @@ namespace MediaPlayer
             }
         }
 
+        public void SearchClicked(string searchValue)
+        {
+            if (String.IsNullOrEmpty(searchValue))
+            {
+                _modifiedPlaylist = null;
+                SetCurrentPlaylist(_currentPlaylistName);
+                return;
+            }
+        
+            List<MediaItem> searchResults;
+
+            List<TagType> searchColumns = new List<TagType>(new TagType[] { TagType.Title, TagType.Album, TagType.Artist, TagType.Genre });
+
+            if (_currentPlaylistName == "Media Library")
+                searchResults = _databaseController.search(searchValue, searchColumns );
+            else
+                searchResults = _databaseController.search(_currentPlaylistName, searchValue, searchColumns);
+
+            if (searchResults != null && searchResults.Any())
+            {
+                _modifiedPlaylist = new MediaList(_currentPlaylistName, this);
+                _modifiedPlaylist.AddRange(searchResults);
+                SetCurrentPlaylist(_currentPlaylistName);    
+            }
+        }
+        
         public void ContextMenuHeaderClicked(string headerValue, IList selectedItems)
         {
             List<MediaItem> newItems = new List<MediaItem>();
@@ -723,7 +773,7 @@ namespace MediaPlayer
 
             foreach (string thisPlaylistName in _playlistNames)
             {
-                MediaLibrary thisPlaylist = GetPlaylistByName(thisPlaylistName);
+                MediaList thisPlaylist = GetPlaylistByName(thisPlaylistName);
                 _databaseController.AddMediaItemsToDatabase(thisPlaylistName, thisPlaylist.GetMedia());
             }
             
@@ -740,18 +790,17 @@ namespace MediaPlayer
             if (_currentItem != null)
                 _currentItem.Position = 0.0;
 
-            ChangeCurrentMedia(_currentPlaylist.GetNextSong());
+            MediaList displayedPlaylist = (_modifiedPlaylist == null) ? _currentPlaylist : _modifiedPlaylist;
+            ChangeCurrentMedia(displayedPlaylist.GetNextSong());
             UpdateDataGrids();
         }
 
         public void MediaFileError()
         {
-            ChangeCurrentMedia(_currentPlaylist.GetNextSong());
+            MediaList displayedPlaylist = (_modifiedPlaylist == null) ? _currentPlaylist : _modifiedPlaylist;
+            ChangeCurrentMedia(displayedPlaylist.GetNextSong());
         }
-        
+
         #endregion View Events 
-
-
-
     }
 }

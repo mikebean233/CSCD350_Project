@@ -233,7 +233,7 @@
                                 <GridViewColumn Header="year">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=year}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Year}" Foreground="Blue"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
 
@@ -250,7 +250,7 @@
                         </ListView.View>
                     </ListView>
                     <Image x:Name="SearchImage" Opacity="0.5" MouseEnter="btnBehavior_MouseEnter" MouseLeave="btnBehavior_MouseLeave" Source="Images/Search.png" MouseUp="SearchImage_OnMouseUp" HorizontalAlignment="Left" Height="30" Margin="303,17,0,0" VerticalAlignment="Top" Width="31"/>
-                    <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="24" Foreground="CornflowerBlue"  Margin="159,18,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" Background="#FF040C4C" BorderBrush="#FF0040FF"/>
+                    <TextBox x:Name="SearchText" HorizontalAlignment="Left" Height="24" Foreground="CornflowerBlue"  Margin="159,18,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" Background="#FF040C4C" BorderBrush="#FF0040FF" TextChanged="SearchText_OnTextChanged"/>
 
                 </Grid>
             </TabItem>
