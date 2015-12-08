@@ -307,6 +307,16 @@ namespace MediaPlayer
             {
             }
         }
+
+        private void SearchImage_OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.SearchClicked(SearchText.Text)), new object[] { });
+        }
+
+        private void SearchText_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => _mainController.SearchClicked(SearchText.Text)), new object[] { });
+        }
     }
 }
 

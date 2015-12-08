@@ -139,9 +139,9 @@
                 <TabItem.Background>
                     <SolidColorBrush Color="#33000000"/>
                 </TabItem.Background>
-              
+
                 <Grid Background="#33000000" Margin="0,0,11,-3" MaxHeight="394" MaxWidth="344">
-                    <ListView Margin="10" Name="lv_MediaLibraryView" SelectionMode="Multiple" Background="#33000000">
+                    <ListView Margin="10,47,10,20" Name="lv_MediaLibraryView" SelectionMode="Multiple" Background="#33000000">
 
                         <ListView.ContextMenu>
                             <ContextMenu x:Name="contextMenu" AllowDrop="True">
@@ -181,7 +181,7 @@
                                 </GridView.ColumnHeaderContainerStyle>
                                 <GridViewColumn>
                                     <GridViewColumn.CellTemplate>
-  
+
                                         <DataTemplate>
                                             <Image x:Name="RowImage" Height="25" Width="25" MouseEnter="RowImage_OnMouseEnter" MouseUp="RowImage_OnMouseUp" MouseLeave="RowImage_OnMouseLeave">
                                                 <Image.Style>
@@ -233,7 +233,7 @@
                                 <GridViewColumn Header="year">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=year}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Year}" Foreground="Blue"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
 
@@ -249,6 +249,8 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
+                    <Image x:Name="SearchImage" Opacity="0.5" MouseEnter="btnBehavior_MouseEnter" MouseLeave="btnBehavior_MouseLeave" Source="Images/Search.png" MouseUp="SearchImage_OnMouseUp" HorizontalAlignment="Left" Height="30" Margin="303,17,0,0" VerticalAlignment="Top" Width="31"/>
+                    <TextBox x:Name="SearchText" HorizontalAlignment="Left" Height="24" Foreground="CornflowerBlue"  Margin="159,18,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" Background="#FF040C4C" BorderBrush="#FF0040FF" TextChanged="SearchText_OnTextChanged"/>
 
                 </Grid>
             </TabItem>
@@ -262,7 +264,7 @@
                         </ListView.ItemContainerStyle>
                         <ListView.View>
                             <GridView x:Name="gv_Playlists">
-                               
+
                                 <GridView.ColumnHeaderContainerStyle>
                                     <Style>
                                         <Setter Property="GridViewColumnHeader.Background" Value="#33000000" />

@@ -146,7 +146,7 @@ namespace MediaPlayer
                 sqlCommand.Parameters.Add("@Path",     DbType.String).Value = fileLocation;
                 sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileType;
                 sqlCommand.Parameters.Add("@Title",    DbType.String).Value = title;
-                sqlCommand.Parameters.Add("@duration", DbType.Int64).Value  = duration;
+                sqlCommand.Parameters.Add("@duration", DbType.Int64 ).Value = duration;
                 sqlCommand.Parameters.Add("@Genre",    DbType.String).Value = Genre;
                 sqlCommand.Parameters.Add("@Artist",   DbType.String).Value = Artist;
                 sqlCommand.Parameters.Add("@Album",    DbType.String).Value = Album;
@@ -166,23 +166,36 @@ namespace MediaPlayer
         }
         #endregion
         #region search
-        public List<MediaItem> search(                          string toSearch, TagType searchIn)
+        public List<MediaItem> search(string toSearch,  List<TagType> columnList)
         {
-            return searchUNSAFE("library", toSearch, searchIn);
+            return searchUNSAFE("library", toSearch, columnList);
         }
-        public List<MediaItem> search(         string playlist, string toSearch, TagType searchIn)
+
+        public List<MediaItem> search(         string playlist, string toSearch, List<TagType> columnList)
         {
             string tableName = getTableName(playlist);
-            return searchUNSAFE(tableName, toSearch, searchIn);
+            return searchUNSAFE(tableName, toSearch, columnList);
         }
-        private List<MediaItem> searchUNSAFE( string tableName, string toSearch, TagType searchIn)
+
+        private List<MediaItem> searchUNSAFE( string tableName, string toSearch, List<TagType> columnList )
         {
             List<MediaItem> items = new List<MediaItem>();
+            if (columnList == null || !columnList.Any())
+                return items;
+            
+            HashSet<TagType> uniqueColumns = new HashSet<TagType>(columnList);
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                sqlCommand.CommandText = "SELECT " + tableName + " FROM library WHERE @TagType LIKE @Search";
-                sqlCommand.Parameters.Add("@TagType", DbType.String).Value = getString(searchIn);
-                sqlCommand.Parameters.Add("@Seach", DbType.String).Value = "%" + toSearch + "%";
+                string query = "SELECT * FROM " + tableName + " WHERE ";
+                foreach (TagType thisColumn in uniqueColumns)
+                {
+                    query += getString(thisColumn) + " LIKE '%' || @search || '%'";
+                    if (thisColumn != uniqueColumns.Last())
+                        query += " OR ";
+                }
+
+                sqlCommand.CommandText = query;
+                sqlCommand.Parameters.AddWithValue("@search", toSearch);
 
                 using (SQLiteDataReader reader = sqlCommand.ExecuteReader())
                 {

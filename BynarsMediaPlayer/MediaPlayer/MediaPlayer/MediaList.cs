@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace MediaPlayer
 {
-    public  class MediaLibrary
+    public  class MediaList
     {
         private string _name;
         private HashSet<MediaItem> _library;
@@ -20,7 +20,7 @@ namespace MediaPlayer
         private IEnumerator<MediaItem> _itemPointer;
         private bool _deletable ;
         
-        public MediaLibrary(string name, MainController mainController)
+        public MediaList(string name, MainController mainController)
         {
             _name = (string.IsNullOrEmpty(name)) ? "" : name;
             _mainController = mainController;
@@ -156,6 +156,9 @@ namespace MediaPlayer
 
         public MediaItem GetPreviousSong()
         {
+            if(_mainController.PlayMode == PlayModeEnum.Repeat)
+                return _currentItem;
+            
             if (_currentItem != null)
                 _currentItem.IsPlaying = false;
 
@@ -224,7 +227,7 @@ namespace MediaPlayer
         {
             if (obj == null || (obj.GetType() != this.GetType()) || this._name == "")
                 return false;
-            MediaLibrary that = (MediaLibrary) obj;
+            MediaList that = (MediaList) obj;
             if (that._name == "")
                 return false;
 
