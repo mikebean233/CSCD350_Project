@@ -112,7 +112,7 @@ namespace MediaPlayer
         private void btnBehavior_MouseLeave(object sender, MouseEventArgs e)
         {
             FrameworkElement element = (FrameworkElement) sender;
-            element.Opacity = 0.25;
+            element.Opacity = 0.5;
         }
 
         private void btnBehavior_MouseDown(object sender, MouseEventArgs e)
@@ -216,9 +216,11 @@ namespace MediaPlayer
         private void HelpBox(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Bynars Media Player" + Environment.NewLine
-                            + "Version 1.0" + Environment.NewLine
+                            + "Version 1.99" + Environment.NewLine
                             + "by: Micheal Peterson, Travis Heppner, Lexi Guches" + Environment.NewLine
-                            + "To use soft ware go to the library tab and add media to the playlist." +
+                            + "To use soft ware go to the library tab and add media to the playlist" + Environment.NewLine
+                            + "by right clicking and navigating to the add media to playlist." + Environment.NewLine
+                            + "Then select the playlist you want to add from." +
                             Environment.NewLine
                             + "Then hit the play button in order to start the media playlist. " + Environment.NewLine
                             + "The next button will go to the next media, while the previous will" + Environment.NewLine
@@ -247,24 +249,34 @@ namespace MediaPlayer
 
         public void UpdateContextMenu(List<string> playlistNames, bool showAddNewMedia)
         {
-            if(showAddNewMedia)
+            if (showAddNewMedia)
+            {
                 this.contextMenu_MediaItem_AddNewMedia.IsEnabled = true;
+                this.contextMenu_MediaItem_AddNewMedia.Visibility = Visibility.Visible;
+            }
             else
+            {
                 this.contextMenu_MediaItem_AddNewMedia.IsEnabled = false;
+                this.contextMenu_MediaItem_AddNewMedia.Visibility = Visibility.Collapsed;
+            }
+
+            contextMenu_StackPanel_Playlists.Children.Clear();
 
             if (playlistNames != null && playlistNames.Any())
+                contextMenu_Playlist_MenuItem.Visibility = Visibility.Visible;
+            else
+                contextMenu_Playlist_MenuItem.Visibility = Visibility.Collapsed;
+
+            foreach (string thisPlaylist in playlistNames)
             {
-                contextMenu_StackPanel_Playlists.Children.Clear();
-                foreach (string thisPlaylist in playlistNames)
+                if (!string.IsNullOrEmpty(thisPlaylist))
                 {
-                    if (!string.IsNullOrEmpty(thisPlaylist))
-                    {
-                        MenuItem thisItem = new MenuItem() {Header = thisPlaylist};
-                        thisItem.Click += new RoutedEventHandler(ContextMenu_Playlist_Click);
-                        contextMenu_StackPanel_Playlists.Children.Add(thisItem);
-                    }
+                    MenuItem thisItem = new MenuItem() { Header = thisPlaylist };
+                    thisItem.Click += new RoutedEventHandler(ContextMenu_Playlist_Click);
+                    contextMenu_StackPanel_Playlists.Children.Add(thisItem);
                 }
             }
+
 
         }
 

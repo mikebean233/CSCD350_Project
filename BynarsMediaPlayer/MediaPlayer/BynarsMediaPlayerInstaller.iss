@@ -22,9 +22,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\Bynars  Media
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=C:\Users\Lexi\Documents\2015-2016\BynarsFinalProject\Liscense.txt
-InfoBeforeFile=C:\Users\Lexi\Documents\2015-2016\BynarsFinalProject\Install.txt
-InfoAfterFile=C:\Users\Lexi\Documents\2015-2016\BynarsFinalProject\readme.txt
+
 OutputBaseFilename=setup
 Compression=lzma
 PrivilegesRequired=admin

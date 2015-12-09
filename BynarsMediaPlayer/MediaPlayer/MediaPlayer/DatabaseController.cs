@@ -25,7 +25,7 @@ namespace MediaPlayer
             
             sqlConnection = new SQLiteConnection("Data Source = media.DB;Version = 3");
             sqlConnection.Open();
-            String sql = "CREATE TABLE IF NOT EXISTs library (FileName VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration INTEGER, Artist VARCHAR, Album VARCHAR, Genre VARCHAR, Position REAL) ";
+            String sql = "CREATE TABLE IF NOT EXISTs library (FileName VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration INTEGER, Artist VARCHAR, Album VARCHAR, Genre VARCHAR, Position REAL, Year VARCHAR) ";
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sql, sqlConnection))
             {
                 sqlCommand.ExecuteNonQuery();
@@ -40,25 +40,27 @@ namespace MediaPlayer
 
         private void initPlayListID()
         {
-            try
+            
+            using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
+                string sql = "Select * From Playlists ORDER BY TableName DESC ";
+                sqlCommand.CommandText = sql;
+                SQLiteDataReader sqlReader = sqlCommand.ExecuteReader();
+                string s;
+                if (sqlReader.Read())
                 {
-                    string sql = "Select tableName From Playlists ORDER BY TableName DESC LIMIT 1";
-                    sqlCommand.CommandText = sql;
-                    SQLiteDataReader sqlReader = sqlCommand.ExecuteReader();
+                    s = (string)sqlReader["tableName"];
 
-
-                    _playlistID = Int32.Parse(sqlReader.GetString(0).Substring(8));
-                    sqlReader.Close();
-                    sqlReader.Dispose();
+                    _playlistID = Int32.Parse(s.Substring(8) + 1);
                 }
+                else
+                    _playlistID = 1;
+                sqlReader.Close();
+                sqlReader.Dispose();
             }
-            catch
-            {
-                _playlistID = 1;
-                return;
-            }
+            
+            
+            
 
 
         }
@@ -91,7 +93,7 @@ namespace MediaPlayer
             if (items == null || !items.Any())
                 return;
             foreach(MediaItem thisItem in items)
-                addToLibrary(thisItem.Filepath, thisItem.Filename, thisItem.Title, thisItem.Duration, thisItem.Artist, thisItem.Album, thisItem.Genre, thisItem.Filetype,thisItem.Position );
+                addToLibrary(thisItem.Filepath, thisItem.Filename, thisItem.Title, thisItem.Duration, thisItem.Artist, thisItem.Album, thisItem.Genre, thisItem.Filetype,thisItem.Position, thisItem.Year);
         }
         public void AddMediaItemsToDatabase(string playlist, ICollection<MediaItem> items)
         {
@@ -99,11 +101,11 @@ namespace MediaPlayer
                 return;
             string tableName = getTableName(playlist);//this is faster as it doesn't require multiple calls to figure out the tableName.
             foreach (MediaItem thisItem in items)
-                addToLibraryUNSAFE(tableName, thisItem.Filepath, thisItem.Filename, thisItem.Title, thisItem.Duration, thisItem.Artist, thisItem.Album, thisItem.Genre, thisItem.Filetype, thisItem.Position);
+                addToLibraryUNSAFE(tableName, thisItem.Filepath, thisItem.Filename, thisItem.Title, thisItem.Duration, thisItem.Artist, thisItem.Album, thisItem.Genre, thisItem.Filetype, thisItem.Position, thisItem.Year);
         }
 
         #region addToLibrary
-        public void addToLibrary(                         String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre)
+        public void addToLibrary(                         String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre, string Year)
         {
             string fileType = "";
             string[] splitOnPeriod;
@@ -113,44 +115,34 @@ namespace MediaPlayer
                 fileType = (splitOnPeriod[splitOnPeriod.Length - 1]);
             }
 
-            addToLibraryUNSAFE("library",fileLocation,fileName,title,duration,Artist, Album, Genre, fileType, 0);
+            addToLibraryUNSAFE("library",fileLocation,fileName,title,duration,Artist, Album, Genre, fileType, 0, Year);
         }
-        public void addToLibrary(                         String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre, string fileType, double Position)
+        public void addToLibrary(                         String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre, string fileType, double Position, string Year)
         {
-            addToLibraryUNSAFE("library", fileLocation, fileName, title, duration, Artist, Album, Genre, fileType, 0);
+            addToLibraryUNSAFE("library", fileLocation, fileName, title, duration, Artist, Album, Genre, fileType, Position, Year);
         }
-        public void addToPlayList(      string playlist,  String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre)
-        {
-            string fileType = "";
-            string tableName;
-            string[] splitOnPeriod;
-            if (!string.IsNullOrEmpty(fileLocation) && fileName.Contains("."))
-            {
-                splitOnPeriod = fileLocation.Split('.');
-                fileType = (splitOnPeriod[splitOnPeriod.Length - 1]);
-            }
-            tableName = getTableName(playlist);
-            addToLibraryUNSAFE(tableName, fileLocation, fileName, title, duration, Artist, Album, Genre, fileType, 0); 
-        }
-        public void addToPlayList(      string playlist,  String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre, string fileType, double Position)
+
+        public void addToPlayList(      string playlist,  String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre, string fileType, double Position, string Year)
         {
             string tableName = getTableName(playlist);
-            addToLibraryUNSAFE(tableName, fileLocation, fileName, title, duration, Artist, Album, Genre, fileType, 0);
+            addToLibraryUNSAFE(tableName, fileLocation, fileName, title, duration, Artist, Album, Genre, fileType, Position, Year);
         }
-        private void addToLibraryUNSAFE(string tableName, String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre, string fileType, double Position)
+        private void addToLibraryUNSAFE(string tableName, String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre, string fileType, double Position, string Year)
         {
+            Console.Out.WriteLine("adding to database");
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                sqlCommand.CommandText = "INSERT INTO "+ tableName +" (FileName, Path, FileType, Title, duration, Artist, Album, Genre, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                sqlCommand.CommandText = "INSERT INTO "+ tableName +" (FileName, Path, FileType, Title, Duration, Artist, Album, Genre, Position, Year) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
                 sqlCommand.Parameters.Add("@FileName", DbType.String).Value = fileName;
                 sqlCommand.Parameters.Add("@Path",     DbType.String).Value = fileLocation;
                 sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileType;
                 sqlCommand.Parameters.Add("@Title",    DbType.String).Value = title;
-                sqlCommand.Parameters.Add("@duration", DbType.Int64 ).Value = duration;
-                sqlCommand.Parameters.Add("@Genre",    DbType.String).Value = Genre;
+                sqlCommand.Parameters.Add("@Duration", DbType.Int64 ).Value = duration;
                 sqlCommand.Parameters.Add("@Artist",   DbType.String).Value = Artist;
                 sqlCommand.Parameters.Add("@Album",    DbType.String).Value = Album;
+                sqlCommand.Parameters.Add("@Genre",    DbType.String).Value = Genre;
                 sqlCommand.Parameters.Add("@Position", DbType.Double).Value = Position;
+                sqlCommand.Parameters.Add("@Year",     DbType.String).Value = Year;
                 try
                 {
                     sqlCommand.ExecuteNonQuery();
@@ -292,13 +284,13 @@ namespace MediaPlayer
                 sqlCommand.Parameters.Add("@tableName", DbType.String).Value = playlistID;
                 sqlCommand.ExecuteNonQuery();
 
-                sql = "CREATE TABLE " + playlistID + " (FileName VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration INTEGER, Artist VARCHAR, Album VARCHAR, Genre VARCHAR, Position REAL)";
+                sql = "CREATE TABLE " + playlistID + " (FileName VARCHAR, Path VARCHAR UNIQUE, FileType VARCHAR, Title VARCHAR, Duration INTEGER, Artist VARCHAR, Album VARCHAR, Genre VARCHAR, Position REAL, Year VARCHAR)";
                 sqlCommand.CommandText = sql;
                 sqlCommand.ExecuteNonQuery();
             }
 
         }
-        public void addPlaylist(string playlist, List<MediaItem> contents)
+        public void addPlayList(string playlist, List<MediaItem> contents)
         {
             addPlayList(playlist);
             AddMediaItemsToDatabase(playlist, contents);
@@ -372,13 +364,16 @@ namespace MediaPlayer
                 
                 MediaItem thisItem = new MediaItem((string)reader["Path"])
                 {
-                    Album = (string)reader["Album"],
-                    Artist = (string)reader["Artist"],
-                    Duration = (long)reader["Duration"],
+                    Album    = (string)reader["Album"],
+                    Artist   = (string)reader["Artist"],
+                    Duration = (long)  reader["Duration"],
                     Filename = (string)reader["FileName"],
                     Filetype = (string)reader["FileType"],
                     Position = (double)reader["Position"],
-                    Title = (string)reader["Title"]
+                    Genre = (string)reader["Genre"],
+                    Title = (string)reader["Title"],
+                    Year     = (string)reader["Year"]
+
                 };
                 items.Add(thisItem);
                
@@ -390,6 +385,8 @@ namespace MediaPlayer
         private string getTableName(string playListName)
         {
             string tableName;
+            if (playListName == "Media Library")
+                return "library";
 
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
