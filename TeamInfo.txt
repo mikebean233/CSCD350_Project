@@ -1,6 +1,6 @@
 Team Name: Bynars
 
 Team Members:
-	Michael Petterson
-	Travis Hepner
+	Michael Peterson
+	Travis Heppner
 	Lexi Guches
