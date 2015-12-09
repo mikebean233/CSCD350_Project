@@ -130,12 +130,12 @@
         <!-- Media -->
         <MediaElement x:Name="me_MediaElement" Margin="27,23,390,90" LoadedBehavior="Manual" UnloadedBehavior="Stop" Stretch="Fill" MediaEnded="Me_MediaElement_OnMediaEnded" ScrubbingEnabled="true"/>
 
-        <Label x:Name="lbl_MetaData" Content="Metadata" HorizontalAlignment="Left" Margin="427,479,0,0" VerticalAlignment="Top" Height="51" Width="242" Foreground="#FFFDFDFD"/>
+        <TextBlock x:Name="lbl_MetaData" HorizontalAlignment="Left" Margin="427,479,0,0" VerticalAlignment="Top" Height="51" Width="242" Foreground="#0074AD" TextWrapping="NoWrap" TextAlignment="Center"/>
 
         <!-- Library -->
-        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="361" Foreground="Blue" Background="#33922C2C">
+        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="429" Margin="927,23,0,0" VerticalAlignment="Top" Width="361" Foreground="#0074AD" Background="#33922C2C">
 
-            <TabItem x:Name="TabItem_CurrentPlaylist" Header="" Foreground="Blue" >
+            <TabItem x:Name="TabItem_CurrentPlaylist" Header="" Foreground="#0074AD" >
                 <TabItem.Background>
                     <SolidColorBrush Color="#33000000"/>
                 </TabItem.Background>
@@ -180,7 +180,7 @@
                                 <GridView.ColumnHeaderContainerStyle>
                                     <Style>
                                         <Setter Property="GridViewColumnHeader.Background" Value="#33000000" />
-                                        <Setter Property="GridViewColumnHeader.Foreground" Value="Blue"></Setter>
+                                        <Setter Property="GridViewColumnHeader.Foreground" Value="#0074AD"></Setter>
                                     </Style>
                                 </GridView.ColumnHeaderContainerStyle>
                                 <GridViewColumn>
@@ -212,14 +212,14 @@
                                 <GridViewColumn Header="Title">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=Title}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Title}" Foreground="#0074AD"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Artist">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=Artist}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Artist}" Foreground="#0074AD"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
 
@@ -227,7 +227,7 @@
                                 <GridViewColumn Header="Genre">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=Genre}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Genre}" Foreground="#0074AD"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
 
@@ -235,7 +235,7 @@
                                 <GridViewColumn Header="Year">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=Year}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Year}" Foreground="#0074AD"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
 
@@ -243,7 +243,7 @@
                                 <GridViewColumn Header="Filepath">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=Filepath}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Filepath}" Foreground="#0074AD"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
 
@@ -256,7 +256,7 @@
 
                 </Grid>
             </TabItem>
-            <TabItem x:Name="TabItem_Playlists" Header="PlayLists" Background="#33000000" Foreground="Blue" >
+            <TabItem x:Name="TabItem_Playlists" Header="PlayLists" Background="#33000000" Foreground="#0074AD" >
                 <Grid Background="#33000000">
                     <ListView x:Name="lv_Playlists" ItemsSource="{Binding PlaylistViewRow}" HorizontalAlignment="Left" Height="381" Margin="10,10,0,0" VerticalAlignment="Top" Width="335" Background="#33000000" SelectionMode="Single" AllowDrop="True">
                         <ListView.ItemContainerStyle>
@@ -270,7 +270,7 @@
                                 <GridView.ColumnHeaderContainerStyle>
                                     <Style>
                                         <Setter Property="GridViewColumnHeader.Background" Value="#33000000" />
-                                        <Setter Property="GridViewColumnHeader.Foreground" Value="Blue"></Setter>
+                                        <Setter Property="GridViewColumnHeader.Foreground" Value="#0074AD"></Setter>
                                     </Style>
 
                                 </GridView.ColumnHeaderContainerStyle>
@@ -299,7 +299,7 @@
                                 <GridViewColumn Header="Playlist Name" >
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=Name}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Name}" Foreground="#0074AD"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -403,7 +403,7 @@
                 Visibility="Visible"
                 Source="Images/ShuffleButton.png"/>
 
-        <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="116,487.5,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="AliceBlue" Background="#009E9ED6" Height="31"/>
+        <Label x:Name="lbl_ScrubBarTime" Content="0:00:00 / 0:00:00" HorizontalAlignment="Left" Margin="116,487.5,0,0" VerticalAlignment="Top" Width="106" FontWeight="Bold" Foreground="#0074AD" Background="#009E9ED6" Height="31"/>
 
         <Slider x:Name="slider_ScrubBar" HorizontalAlignment="Left" Height="7" Margin="37,458,0,0" VerticalAlignment="Top" Width="864" Maximum="1" Style="{StaticResource Horizontal_Slider}" ValueChanged="slider_ScrubBar_ValueChanged"/>
 

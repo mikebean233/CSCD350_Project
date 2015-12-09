@@ -496,8 +496,12 @@ namespace MediaPlayer
             }
             this._currentItem = displayedPlaylist.GetCurrentMedia();
             _mediaElementPollingTimer.Enabled = true;
+
+            if (_currentItem != null)
+                UpdateCurrentSongMetaData(_currentItem.Title, _currentItem.Artist);
+
             return true;
-        }
+     }
 
 
         #region View Events
@@ -535,6 +539,10 @@ namespace MediaPlayer
                 _view.btn_PlayButton.Source = new BitmapImage(new Uri(@"./Images/PauseButton.png", UriKind.Relative));
         }
 
+        public void UpdateCurrentSongMetaData(String title, String artist)
+        {
+            _view.lbl_MetaData.Text = "Title: " + title + "\nArtist: " + artist;
+        }
         public void RewindButtonPressed()
         {
             PlaySpeedCycle("Slower");
