@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MediaPlayer
 {
-    class Utilities
+    public class Utilities
     {
         private static Random _random;
 
