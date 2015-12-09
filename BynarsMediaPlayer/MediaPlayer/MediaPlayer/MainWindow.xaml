@@ -41,7 +41,7 @@
                     <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Track Grid.Row="1" x:Name="PART_Track"   >
+                <Track Grid.Row="1" x:Name="PART_Track" >
                     <Track.DecreaseRepeatButton>
                         <RepeatButton Style="{StaticResource SliderRepeatButton1}"/>
                     </Track.DecreaseRepeatButton>
@@ -157,7 +157,11 @@
                                             </StackPanel>
                                         </MenuItem.Header>
                                     </MenuItem>
-                                    <StackPanel x:Name="contextMenu_StackPanel_Playlists" Orientation="Vertical"/>
+                                    <MenuItem  x:Name="contextMenu_Playlist_MenuItem">
+                                        <MenuItem.Header>
+                                            <StackPanel x:Name="contextMenu_StackPanel_Playlists" Orientation="Vertical"/>
+                                        </MenuItem.Header>
+                                    </MenuItem>
                                 </MenuItem>
                                 <MenuItem Header="Add New Media" x:Name="contextMenu_MediaItem_AddNewMedia">
                                     <MenuItem Header="Add Files" Click="MenuItem_Click"/>
@@ -202,9 +206,7 @@
 
 
                                     <GridViewColumn.Header>
-                                        <GridViewColumnHeader Tag="isPlaying" Click="ContextMenu_CreatePlaylistButton_Click">
-                                            IsPlaying
-                                        </GridViewColumnHeader>
+                                        <GridViewColumnHeader Tag="isPlaying" Click="ContextMenu_CreatePlaylistButton_Click"/>
                                     </GridViewColumn.Header>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Title">
@@ -217,7 +219,7 @@
                                 <GridViewColumn Header="Artist">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=Title}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Artist}" Foreground="Blue"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
 
@@ -225,12 +227,12 @@
                                 <GridViewColumn Header="Genre">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Path=Title}" Foreground="Blue"/>
+                                            <TextBlock Text="{Binding Path=Genre}" Foreground="Blue"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
 
                                 </GridViewColumn>
-                                <GridViewColumn Header="year">
+                                <GridViewColumn Header="Year">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Path=Year}" Foreground="Blue"/>
