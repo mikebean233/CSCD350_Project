@@ -19,7 +19,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\Bynars  Media
+DefaultDirName=GetEnvironmentVariable('USER')\Bynars  Media
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 
