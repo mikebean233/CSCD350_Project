@@ -171,8 +171,8 @@ namespace MediaPlayer
             UpdateDataGrids();
             UpdateContextMenu();
             _view.Dispatcher.Invoke(new Action(() => UpdatePlaylistsTab()), new object[] { });
-
-
+            _view.Dispatcher.Invoke(new Action(() => UpdateView()), new object[] { });
+            
             // Start the polling timer (which is used to update the view)
             _mediaElementPollingTimer.Start();
 
@@ -392,7 +392,6 @@ namespace MediaPlayer
                 // Update Progress Slider
                 double completionRatio = timeElapsed.TotalMilliseconds/totalTime.TotalMilliseconds;
                 _view.slider_ScrubBar.Value = completionRatio;
-               // UpdateDataGrids();
                 _currentItem.Position = completionRatio;
             }
             else
