@@ -159,7 +159,7 @@ namespace MediaPlayer
             // and add that to the library.
             if (!_mediaLibrary.Any())
             {
-                StartScanner(_defaultScanDirectory, false);
+                StartScanner(_defaultScanDirectory, true);
             }
 
             // Get the player back to the playlist and media it was at before the last shut down
@@ -701,6 +701,7 @@ namespace MediaPlayer
             if (_currentPlaylistName == playlistName)
                 SetCurrentPlaylist("MediaLibrary");
             RemovePlaylist(clickedItem.Name);
+            UpdateContextMenu();
             UpdateDataGrids();    
         }
 
@@ -821,13 +822,6 @@ namespace MediaPlayer
         public void CloseWindow()
         {
             Utilities.SerializeObjectToJson<MainController>(_stateCaptureFileName, this);
-            _databaseController.AddMediaItemsToDatabase(_mediaLibrary.GetMedia());
-
-            foreach (string thisPlaylistName in _playlistNames)
-            {
-                MediaList thisPlaylist = GetPlaylistByName(thisPlaylistName);
-                _databaseController.AddMediaItemsToDatabase(thisPlaylistName, thisPlaylist.GetMedia());
-            }
             
             if (_fileScannerThread != null && _fileScannerThread.IsAlive)
                 _fileScannerThread.Abort();

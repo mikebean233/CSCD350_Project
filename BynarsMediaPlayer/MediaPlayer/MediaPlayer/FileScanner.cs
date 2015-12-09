@@ -110,40 +110,33 @@ namespace MediaPlayer
         {
             if (string.IsNullOrEmpty(directory))
                 return new ObservableCollection<string>();
+            string[] directories = {};
 
-            ObservableCollection<string> files = new ObservableCollection<string>();
-            files.CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionChanged);
             try
             {
                 string[] theseFiles = Directory.GetFiles(directory, type, SearchOption.TopDirectoryOnly);
-                //files.InsertRange(files.Count, Directory.GetFiles(directory, type, SearchOption.TopDirectoryOnly));
-                if (recurse)
-                {
-                    foreach (string thisDir in theseFiles)
-                    {
-                        files.Add(thisDir);
-                    }
-                }
+                foreach(string thisFile in theseFiles)
+                    _mainController.AddMediaEvent(thisFile);
             }
             catch (UnauthorizedAccessException ex)
             {
 
-                return files;
+                
             }
-            string[] directories = Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly);
+
+            try { directories = Directory.GetDirectories(directory, "*", SearchOption.TopDirectoryOnly); } catch (Exception e) { }
 
             foreach (string subdir in directories)
             {
-                //files.AddRange(retreieveFilesList(subdir, type));
                 Collection<string> theseFiles = retreieveFilesList(subdir, type, recurse);
                 foreach (string thisFile in theseFiles)
                 {
-                    files.Add(thisFile);
+                    _mainController.AddMediaEvent(thisFile);
                 }
 
             }
 
-            return files;
+            return new ObservableCollection<string>();
         }
 
         private static void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
