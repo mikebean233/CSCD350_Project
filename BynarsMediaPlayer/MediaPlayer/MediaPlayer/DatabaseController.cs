@@ -129,19 +129,20 @@ namespace MediaPlayer
         }
         private void addToLibraryUNSAFE(string tableName, String fileLocation, String fileName, String title, long duration, String Artist, String Album, String Genre, string fileType, double Position, string Year)
         {
+            Console.Out.WriteLine("adding to database");
             using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                sqlCommand.CommandText = "INSERT INTO "+ tableName +" (FileName, Path, FileType, Title, duration, Artist, Album, Genre, Position, Year) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                sqlCommand.CommandText = "INSERT INTO "+ tableName +" (FileName, Path, FileType, Title, Duration, Artist, Album, Genre, Position, Year) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
                 sqlCommand.Parameters.Add("@FileName", DbType.String).Value = fileName;
                 sqlCommand.Parameters.Add("@Path",     DbType.String).Value = fileLocation;
                 sqlCommand.Parameters.Add("@FileType", DbType.String).Value = fileType;
                 sqlCommand.Parameters.Add("@Title",    DbType.String).Value = title;
-                sqlCommand.Parameters.Add("@duration", DbType.Int64 ).Value = duration;
+                sqlCommand.Parameters.Add("@Duration", DbType.Int64 ).Value = duration;
                 sqlCommand.Parameters.Add("@Artist",   DbType.String).Value = Artist;
                 sqlCommand.Parameters.Add("@Album",    DbType.String).Value = Album;
                 sqlCommand.Parameters.Add("@Genre",    DbType.String).Value = Genre;
                 sqlCommand.Parameters.Add("@Position", DbType.Double).Value = Position;
-                sqlCommand.Parameters.Add("@Year",     DbType.Double).Value = Year;
+                sqlCommand.Parameters.Add("@Year",     DbType.String).Value = Year;
                 try
                 {
                     sqlCommand.ExecuteNonQuery();
