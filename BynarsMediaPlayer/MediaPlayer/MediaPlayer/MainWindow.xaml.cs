@@ -216,9 +216,11 @@ namespace MediaPlayer
         private void HelpBox(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Bynars Media Player" + Environment.NewLine
-                            + "Version 1.0" + Environment.NewLine
+                            + "Version 1.99" + Environment.NewLine
                             + "by: Micheal Peterson, Travis Heppner, Lexi Guches" + Environment.NewLine
-                            + "To use soft ware go to the library tab and add media to the playlist." +
+                            + "To use soft ware go to the library tab and add media to the playlist" + Environment.NewLine
+                            + "by right clicking and navigating to the add media to playlist." + Environment.NewLine
+                            + "Then select the playlist you want to add from." +
                             Environment.NewLine
                             + "Then hit the play button in order to start the media playlist. " + Environment.NewLine
                             + "The next button will go to the next media, while the previous will" + Environment.NewLine
