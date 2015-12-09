@@ -40,25 +40,27 @@ namespace MediaPlayer
 
         private void initPlayListID()
         {
-            try
+            
+            using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
             {
-                using (SQLiteCommand sqlCommand = new SQLiteCommand(sqlConnection))
+                string sql = "Select * From Playlists ORDER BY TableName DESC ";
+                sqlCommand.CommandText = sql;
+                SQLiteDataReader sqlReader = sqlCommand.ExecuteReader();
+                string s;
+                if (sqlReader.Read())
                 {
-                    string sql = "Select tableName From Playlists ORDER BY TableName DESC LIMIT 1";
-                    sqlCommand.CommandText = sql;
-                    SQLiteDataReader sqlReader = sqlCommand.ExecuteReader();
+                    s = (string)sqlReader["tableName"];
 
-
-                    _playlistID = Int32.Parse(sqlReader.GetString(0).Substring(8));
-                    sqlReader.Close();
-                    sqlReader.Dispose();
+                    _playlistID = Int32.Parse(s.Substring(8) + 1);
                 }
+                else
+                    _playlistID = 1;
+                sqlReader.Close();
+                sqlReader.Dispose();
             }
-            catch
-            {
-                _playlistID = 1;
-                return;
-            }
+            
+            
+            
 
 
         }
@@ -287,7 +289,7 @@ namespace MediaPlayer
             }
 
         }
-        public void addPlaylist(string playlist, List<MediaItem> contents)
+        public void addPlayList(string playlist, List<MediaItem> contents)
         {
             addPlayList(playlist);
             AddMediaItemsToDatabase(playlist, contents);
@@ -363,13 +365,14 @@ namespace MediaPlayer
                 {
                     Album    = (string)reader["Album"],
                     Artist   = (string)reader["Artist"],
-                    Genre    = (string)reader["Genre"],
                     Duration = (long)  reader["Duration"],
                     Filename = (string)reader["FileName"],
                     Filetype = (string)reader["FileType"],
                     Position = (double)reader["Position"],
-                    Title    = (string)reader["Title"],
+                    Genre = (string)reader["Genre"],
+                    Title = (string)reader["Title"],
                     Year     = (string)reader["Year"]
+
                 };
                 items.Add(thisItem);
                
